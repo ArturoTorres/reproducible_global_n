@@ -10,6 +10,7 @@ institute:
 format: 
   beamer:
     incremental: true 
+  html: default
 keep-tex: true
 aspectratio: 169
 fig-height: 5.3	

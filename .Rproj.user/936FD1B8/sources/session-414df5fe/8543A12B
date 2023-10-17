@@ -3,7 +3,7 @@
     "path": "~/Documents/02_working/3-Production/05_models/32_iiasa/global_n/global_n.qmd",
     "project_path": "global_n.qmd",
     "type": "quarto_markdown",
-    "hash": "3484003118",
+    "hash": "626607432",
     "contents": "",
     "dirty": false,
     "created": 1697530412557.0,
@@ -17,15 +17,16 @@
         "docOutlineVisible": "1",
         "rmdVisualCollapsedChunks": "",
         "rmdVisualModeLocation": "463:268.3999938964844",
-        "cursorPosition": "30,0",
-        "scrollLine": "18"
+        "cursorPosition": "12,15",
+        "scrollLine": "3",
+        "quartoPreviewFormat": "html"
     },
     "folds": "",
-    "lastKnownWriteTime": 1697531635,
+    "lastKnownWriteTime": 1697532500,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1697531635430,
+    "last_content_update": 1697532500818,
     "read_only": false,
     "read_only_alternatives": []
 }
