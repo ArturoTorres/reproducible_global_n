@@ -10,6 +10,7 @@ institute:
 format: 
   beamer:
     incremental: true 
+    cite-method: natbib
   html: default
 keep-tex: true
 aspectratio: 169
@@ -17,7 +18,21 @@ fig-height: 5.3
 monofont: 'Menlo'
 monofontoptions: 
   - Scale=0.35
+bibliography: global_n.bib
 ---
+
+```{r}
+#| label: setup
+#| include: false
+
+
+chunk_hook  <- knitr::knit_hooks$get("chunk")
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- chunk_hook(x, options)
+  paste0("\\linespread{0.5}\n", x, "\n\n\\linespread{2}")
+})
+
+```
 
 ## Goal
 
@@ -29,3 +44,158 @@ monofontoptions:
 
     -   "Provide a reproducible code associated to these tasks."
 
+
+## Task 1
+
+- Using SPAM raster data [@wood-sichra_spatial_2016], a new raster at the same resolution, containing wheat production volume (in million tons Mt) is produced. 
+
+- Global scale in a raster format (5 arcminute spatial resolution) estimates of yield (r_y) in Kg/Ha, physical area (r_a) in Ha and harvested area (r_h) in Ha for the year 2005 are available.
+
+
+```{r, echo=FALSE}
+library(terra)
+library(ggplot2)
+
+# describe("data/SPAM_2005_v3.2/SPAM2005V3r2_global_Y_TA_WHEA_A.tif")
+# describe("data/SPAM_2005_v3.2/SPAM2005V3r2_global_A_TA_WHEA_A.tif")
+# describe("data/SPAM_2005_v3.2/SPAM2005V3r2_global_H_TA_WHEA_A.tif")
+
+```
+## Reading SPAM data
+
+```{r, echo=TRUE}
+spam_data = list("yield" = rast("data/SPAM_2005_v3.2/SPAM2005V3r2_global_Y_TA_WHEA_A.tif"),
+                 "harvested_area" = rast("data/SPAM_2005_v3.2/SPAM2005V3r2_global_H_TA_WHEA_A.tif"),
+                 "physical_area" = rast("data/SPAM_2005_v3.2/SPAM2005V3r2_global_A_TA_WHEA_A.tif"))
+```
+
+```{r, echo=TRUE}
+str(spam_data)   
+
+spam_data[['yield']]
+```
+
+
+## Calculate Wheat Production
+- Calculate wheat production by multiplying the raster layers for yield (in Kg/Ha) and harvested area (in Ha) using the * operator: 
+
+  - wheat_production = spam_data[["yield"]] * spam_data[["harvested_area"]]
+
+- Convert Units: The resulting values are in Kg, so it is needed to convert them to million tons (Mt). Assuming 1 ton is equal to 1,000 Kg, it is possible to use the following:
+
+  - wheat_production_Mt = wheat_production / (1e3 * 1e6)
+
+## Calculate Wheat Production
+
+- A global map is created and the raster is exported in a geotif format:
+
+::: columns
+::: {.column width="80%"}
+```{r, echo=TRUE}
+wheat_production = spam_data[["yield"]] * spam_data[["harvested_area"]]
+wheat_production_Mt <- wheat_production / (1e9)
+```
+
+```{r, echo=TRUE}
+plot(wheat_production_Mt, col = terrain.colors(10, rev=TRUE))
+```
+
+```{r, echo=TRUE}
+writeRaster(wheat_production_Mt, filename = "./output/wheat_production_Mt.tif", 
+            overwrite=TRUE, gdal = c("COMPRESS=DEFLATE", "TFW=YES"))
+```
+:::
+:::
+
+## Task 2
+
+- Using the newly created raster and the GAUL shapefile of administrative borders, the  production is aggregated to country level and exported to a csv file.
+
+```{r, echo=TRUE}
+library(raster)
+library(sf)
+library(rgdal)
+library(rgeos)
+
+
+gaul_data_sf <- st_read("data/GAUL/g2015_2005_2.shp")
+gaul_data_sp <- readOGR(dsn = "./data/GAUL", layer = "g2015_2005_2")
+wheat_production_raster <- raster("output/wheat_production_Mt.tif")
+
+gaul_lev0 <- levels(factor(gaul_data_sp@data[,"ADM0_NAME"]))
+
+ids <- lapply(gaul_lev0, function(x) which(gaul_data_sp@data[,"ADM0_NAME"] == x))
+
+# sp_join <- as(gaul_data_sp, "SpatialPolygons")
+
+## Parallel computation
+library(pbapply)
+library(parallel)
+library(doParallel)
+
+ncores = detectCores() - 2
+# ncores = 8
+cluster <- makeCluster(ncores)
+registerDoParallel(cluster, cores=ncores)
+
+clusterEvalQ(cl = cluster, c(library(rgeos, raster)))
+clusterExport(cl = cluster, varlist = c("ids", "gaul_data_sp"))
+
+sp_join_lst <- parLapply(cl = cluster, X = 1:length(ids), fun = function(i) {
+  print(paste0(i, "/", length(ids)))
+  gUnionCascaded(gaul_data_sp[ids[[i]],])
+  })
+```
+
+```{r}
+#plot(sp_join)
+# spplot(sp_join_lst[[1]], col = "red", main = gaul_lev0[1]) # Afganistan
+# spplot(sp_join_lst[[57]], col = "red", main = gaul_lev0[57]) # Colombia
+spplot(sp_join_lst[[148]], col = "red", main = gaul_lev0[148]) # Luxemburgo
+# spplot(sp_join_lst[[10]], col = "red", main = gaul_lev0[10]) # Antigua y Barbuda
+```
+```{r}
+str(sp_join_lst[[1]])
+
+# plot(sp.join.districts.lst[[2]], col = "green", add = TRUE)
+# plot(sp.join.districts.lst[[3]], col = "blue", add = TRUE)
+
+clusterExport(cl = cluster, varlist = c("sp_join_lst", "wheat_production_raster", "rasterize"))
+
+raster_lst <- parLapply(cl = cluster, X = 1:length(sp_join_lst), fun = function(i) {
+  print(paste0(i, "/", length(sp_join_lst)))
+  rasterize(sp_join_lst[[i]], wheat_production_raster)
+  })
+
+plot(raster_lst[[260]]) #USA
+
+clusterExport(cl = cluster, varlist = c("raster_lst"))
+
+country_aggregated_production <- parLapply(cl = cluster, X = 1: length(raster_lst), fun = function(i) zonal(raster_lst[[i]], wheat_production_raster, "sum"))
+
+plot(country_aggregated_production)
+
+```
+
+## Assumptions made
+- The computations were done by using the Geodetic CRS:  WGS 84.
+
+- The three input maps from the SPAM model for the year 2005 are global scale in raster format (5 arcminute spatial resolution):
+  - Estimates of yield (r_y) in Kg/Ha, 
+  - Physical area (r_a) in Ha, 
+  - Harvested area (r_h) in Ha.
+
+- 1 ton is equal to 1,000 Kg, so 1 million ton is equal to 1,000,000,000 Kg, i.e. 1e9 Kg.
+
+
+## Issues
+
+## References
+
+::: {#refs}
+:::
+
+```{r}
+library(sessioninfo)
+sessioninfo::session_info(to_file = "session_info.log", info = "all")
+```
