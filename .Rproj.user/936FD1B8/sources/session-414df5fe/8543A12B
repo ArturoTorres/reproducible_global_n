@@ -1,0 +1,31 @@
+{
+    "id": "8543A12B",
+    "path": "~/Documents/02_working/3-Production/05_models/32_iiasa/global_n/global_n.qmd",
+    "project_path": "global_n.qmd",
+    "type": "quarto_markdown",
+    "hash": "3484003118",
+    "contents": "",
+    "dirty": false,
+    "created": 1697530412557.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "rmdVisualMode": "false",
+        "rmdVisualWrapConfigured": "true",
+        "source_window_id": "",
+        "Source": "Source",
+        "docOutlineVisible": "1",
+        "rmdVisualCollapsedChunks": "",
+        "rmdVisualModeLocation": "463:268.3999938964844",
+        "cursorPosition": "30,0",
+        "scrollLine": "18"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1697531635,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1697531635430,
+    "read_only": false,
+    "read_only_alternatives": []
+}
