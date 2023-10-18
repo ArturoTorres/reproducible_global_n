@@ -1,12 +1,12 @@
 ---
-title: "Reproducible Global N"
-subtitle: "Reproducible Spatial Analysis for Charting Nitrogen Dynamics in Global Wheat Production"
-date: 2023-10-17
+title: "ReSANGloW:"
+subtitle: "A Reproducible Spatial Analysis for Charting Nitrogen Dynamics in Global Wheat Production"
+date: 2023-10-18
 date-format: full
 author:
   - Arturo Torres
 institute:
-  - ""
+  - "LIST, ERIN"
 format: 
   beamer:
     incremental: true 
@@ -25,12 +25,15 @@ bibliography: global_n.bib
 #| label: setup
 #| include: false
 
+compute_agg = FALSE
 
 chunk_hook  <- knitr::knit_hooks$get("chunk")
 knitr::knit_hooks$set(chunk = function(x, options) {
   x <- chunk_hook(x, options)
   paste0("\\linespread{0.5}\n", x, "\n\n\\linespread{2}")
 })
+
+timing.ini <- Sys.time()
 
 ```
 
@@ -49,7 +52,7 @@ knitr::knit_hooks$set(chunk = function(x, options) {
 
 - Using SPAM raster data [@wood-sichra_spatial_2016], a new raster at the same resolution, containing wheat production volume (in million tons Mt) is produced. 
 
-- Global scale in a raster format (5 arcminute spatial resolution) estimates of yield (r_y) in Kg/Ha, physical area (r_a) in Ha and harvested area (r_h) in Ha for the year 2005 are available.
+- Global scale in a raster format (5 arcminute spatial resolution) estimates of yield in Kg/Ha, physical area in Ha and harvested area in Ha for the year 2005 are available.
 
 
 ```{r, echo=FALSE}
@@ -89,29 +92,50 @@ spam_data[['yield']]
 
 - A global map is created and the raster is exported in a geotif format:
 
-::: columns
-::: {.column width="80%"}
 ```{r, echo=TRUE}
 wheat_production = spam_data[["yield"]] * spam_data[["harvested_area"]]
 wheat_production_Mt <- wheat_production / (1e9)
 ```
 
 ```{r, echo=TRUE}
-plot(wheat_production_Mt, col = terrain.colors(10, rev=TRUE))
-```
+library(raster)
 
-```{r, echo=TRUE}
 writeRaster(wheat_production_Mt, filename = "./output/wheat_production_Mt.tif", 
             overwrite=TRUE, gdal = c("COMPRESS=DEFLATE", "TFW=YES"))
 ```
-:::
-:::
+
+## Wheat Production in Mt in 2005
+```{r, echo=FALSE}
+wheat_production_raster <- raster("output/wheat_production_Mt.tif")
+
+# plot(wheat_production_Mt, col = terrain.colors(10, rev=TRUE), main = " Wheat production in Mt in 2005")
+
+library(sp)
+library(ggplot2)
+library(scales)
+library(viridis)  # better colors for everyone
+library(ggthemes) # theme_map()
+
+df_prod = as(wheat_production_raster, "SpatialPixelsDataFrame")
+df_prod = as.data.frame(df_prod) 
+colnames(df_prod)[1] = "Prod_Mt"
+
+ggplot() +  
+  geom_tile(data=df_prod, aes(x=x, y=y, fill=Prod_Mt), alpha=0.8) + 
+  # geom_polygon(data=gaul_data_sp, aes(x=long, y=lat, group=group), fill=NA, color="grey50", size=0.25) +
+  scale_fill_viridis() +
+  coord_equal() +
+  theme_map() +
+  theme(legend.position="bottom") +
+  theme(legend.key.width=unit(2, "cm"))  +
+  ggtitle("Wheat production in Mt, 2005") 
+```
 
 ## Task 2
 
 - Using the newly created raster and the GAUL shapefile of administrative borders, the  production is aggregated to country level and exported to a csv file.
 
-```{r, echo=TRUE}
+```{r pre-parallel, echo=TRUE}
 library(raster)
 library(sf)
 library(rgdal)
@@ -120,7 +144,6 @@ library(rgeos)
 
 gaul_data_sf <- st_read("data/GAUL/g2015_2005_2.shp")
 gaul_data_sp <- readOGR(dsn = "./data/GAUL", layer = "g2015_2005_2")
-wheat_production_raster <- raster("output/wheat_production_Mt.tif")
 
 gaul_lev0 <- levels(factor(gaul_data_sp@data[,"ADM0_NAME"]))
 
@@ -128,74 +151,351 @@ ids <- lapply(gaul_lev0, function(x) which(gaul_data_sp@data[,"ADM0_NAME"] == x)
 
 # sp_join <- as(gaul_data_sp, "SpatialPolygons")
 
-## Parallel computation
-library(pbapply)
-library(parallel)
-library(doParallel)
+```
 
-ncores = detectCores() - 2
-# ncores = 8
-cluster <- makeCluster(ncores)
-registerDoParallel(cluster, cores=ncores)
+```{r parallel-join, echo=TRUE, eval=compute_agg}
 
-clusterEvalQ(cl = cluster, c(library(rgeos, raster)))
-clusterExport(cl = cluster, varlist = c("ids", "gaul_data_sp"))
-
-sp_join_lst <- parLapply(cl = cluster, X = 1:length(ids), fun = function(i) {
-  print(paste0(i, "/", length(ids)))
-  gUnionCascaded(gaul_data_sp[ids[[i]],])
+if(compute_agg == TRUE) { ## Parallel computation
+  library(pbapply)
+  library(parallel)
+  library(doParallel)
+  
+  ncores = detectCores() - 2
+  # ncores = 8
+  cluster <- makeCluster(ncores)
+  registerDoParallel(cluster, cores=ncores)
+  
+  clusterEvalQ(cl = cluster, c(library(rgeos, raster)))
+  clusterExport(cl = cluster, varlist = c("ids", "gaul_data_sp"))
+  
+  sp_join_lst <- parLapply(cl = cluster, X = 1:length(ids), fun = function(i) {
+    print(paste0(i, "/", length(ids)))
+    gUnionCascaded(gaul_data_sp[ids[[i]],])
   })
+
+  stopCluster(cl=cluster)
+  
+  save(sp_join_lst, file = "./output/sp_join_lst.RData")
+}
 ```
 
 ```{r}
+
+load("./output/sp_join_lst.RData")
+
 #plot(sp_join)
 # spplot(sp_join_lst[[1]], col = "red", main = gaul_lev0[1]) # Afganistan
-# spplot(sp_join_lst[[57]], col = "red", main = gaul_lev0[57]) # Colombia
+spplot(sp_join_lst[[57]], col = "red", main = gaul_lev0[57]) # Colombia
 spplot(sp_join_lst[[148]], col = "red", main = gaul_lev0[148]) # Luxemburgo
 # spplot(sp_join_lst[[10]], col = "red", main = gaul_lev0[10]) # Antigua y Barbuda
 ```
-```{r}
+```{r parallel-agg, eval=FALSE} 
+# this chunk is not required (eval = TRUE only if a raster splitted per country is needed)
+
 str(sp_join_lst[[1]])
 
-# plot(sp.join.districts.lst[[2]], col = "green", add = TRUE)
-# plot(sp.join.districts.lst[[3]], col = "blue", add = TRUE)
-
-clusterExport(cl = cluster, varlist = c("sp_join_lst", "wheat_production_raster", "rasterize"))
+if(compute_agg == TRUE){
+  library(pbapply)
+  library(parallel)
+  library(doParallel)
+  
+  ncores = detectCores() - 2
+  # ncores = 8
+  cluster <- makeCluster(ncores)
+  registerDoParallel(cluster, cores=ncores)
+  
+  clusterEvalQ(cl = cluster, c(library(rgeos, raster)))
+  clusterExport(cl = cluster, varlist = c("sp_join_lst", "wheat_production_raster", "rasterize"))
 
 raster_lst <- parLapply(cl = cluster, X = 1:length(sp_join_lst), fun = function(i) {
   print(paste0(i, "/", length(sp_join_lst)))
   rasterize(sp_join_lst[[i]], wheat_production_raster)
   })
 
+stopCluster(cl=cluster)
+
+save(raster_lst, file = "./output/raster_lst.RData")
+  
+}
+```
+
+```{r, eval=FALSE}
+# this chunk is not required (eval = TRUE only if a raster splitted per country is needed)
+
+load("./output/raster_lst.RData")
+
 plot(raster_lst[[260]]) #USA
+```
 
-clusterExport(cl = cluster, varlist = c("raster_lst"))
+```{r parallel-country-prod, eval=compute_agg}
+if(compute_agg == TRUE){
+  library(pbapply)
+  library(parallel)
+  library(doParallel)
+  
+  ncores = detectCores() - 2
+  # ncores = 8
+  cluster <- makeCluster(ncores)
+  registerDoParallel(cluster, cores=ncores)
+  
+  clusterEvalQ(cl = cluster, c(library(raster)))
+  clusterExport(cl = cluster, varlist = c("sp_join_lst", "wheat_production_raster"))
+  
+  country_aggregated_production_lst = parLapply(cl = cluster, X=1:length(sp_join_lst), fun = function(i){
+     raster::extract(wheat_production_raster, # raster layer
+	   sp_join_lst[[i]],  # spatial polygon for extraction
+	   fun=sum,           # what to value to extract
+	   df=TRUE,           # return a dataframe?
+	   na.rm = TRUE)      # remove NAs?               
+   })
+  
+  stopCluster(cl=cluster)
+  
+   save(country_aggregated_production_lst, file = "./output/country_aggregated_production_lst.RData")
+  
+   stopCluster(cl=cluster)
+}
+  
+```
+## Create a Data Frame and Rename Columns
 
-country_aggregated_production <- parLapply(cl = cluster, X = 1: length(raster_lst), fun = function(i) zonal(raster_lst[[i]], wheat_production_raster, "sum"))
+- Rename the columns to indicate the country name and the aggregated wheat production in million tons.
 
-plot(country_aggregated_production)
+- The country_production_df contains a data frame with each country's name and its aggregated wheat production in million tons. This data frame can be used for further analysis or visualization, and export to a csv file.
+
+## Wheat Production: Top 10 Most Productive Countries in 2005
+
+```{r, echo=TRUE}
+load("./output/country_aggregated_production_lst.RData")
+
+country_production_df = data.frame(do.call(what = rbind, args = country_aggregated_production_lst)) 
+
+country_production_df$ID = gaul_lev0
+```
+
+```{r, echo=TRUE}
+colnames(country_production_df) <- c( "Country", "Wheat_Production_Mt")
+
+top10_order = country_production_df[order(country_production_df$Wheat_Production_Mt, decreasing = TRUE), ]
+
+top10_order[1:10,]
+
+write.csv(country_production_df, file = "output/country_production_wheat.csv")
+```
+
+## Task 3
+- To create a raster map of the nitrogen (N) output in harvested wheat yield, assuming that 2% of the harvested wheat yield consists of the N element, it is used again the "raster" package. Here are the steps to achieve this:
+
+  - Read the "wheat_production" raster created earlier in Task 1. 
+
+  - Calculate Nitrogen Output Raster: A new raster that represents the nitrogen (N) output in harvested wheat yield is created. Assuming 2% of the harvested yield is N, the following formula is used:
+
+    - nitrogen_output_raster = wheat_production_raster * 0.02
+
+  - Plot the Nitrogen Output Raster: Visualize the "nitrogen_output_raster" using the plot function from the "raster" package.
+
+  - Export the Nitrogen Output Raster:
+To export the raster map of nitrogen output, the writeRaster function is used and saved in GeoTiff format.
+
+```{r nitrogen-output, echo=TRUE}
+library(raster)
+
+wheat_production_raster = raster("output/wheat_production_Mt.tif")
+
+nitrogen_output_raster = wheat_production_raster * 0.02
 
 ```
 
-## Assumptions made
+## Global Nitrogen Output
+- A raster map that represents the nitrogen (N) output in the harvested wheat yield has been created, based on the assumption that 2% of the yield consists of the N element. This map will show the distribution of nitrogen output in million tons (Mt) across the Globe. 
+
+## Global Nitrogen Output in Harvested Wheat Yield in Mt in 2005
+::: columns
+::: {.column width="95%"}
+
+```{r nitrogen-output-plot}
+
+library(ggplot2)
+library(scales)
+library(viridis)  # better colors for everyone
+library(ggthemes) # theme_map()
+
+df_n = as(nitrogen_output_raster, "SpatialPixelsDataFrame")
+df_n = as.data.frame(df_n) 
+colnames(df_n)[1] = "N_out"
+
+ggplot() +  
+  geom_tile(data=df_n, aes(x=x, y=y, fill=N_out), alpha=0.8) + 
+  # geom_polygon(data=gaul_data_sp, aes(x=long, y=lat, group=group), fill=NA, color="grey50", size=0.25) +
+  scale_fill_viridis() +
+  coord_equal() +
+  theme_map() +
+  theme(legend.position="bottom") +
+  theme(legend.key.width=unit(2, "cm"))  
+  # ggtitle("Nitrogen Output in Harvested Wheat Yield in Mt for 2005") 
+```
+:::
+:::
+
+```{r nitrogen-output-write, echo=TRUE}
+raster::writeRaster(nitrogen_output_raster, filename = "output/nitrogen_output.tif", format = "GTiff", overwrite = TRUE)
+
+```
+
+## Task 4
+
+- Using the dataset of country-level nitrogen use efficiency (NUE) of wheat from [@zhang_managing_2015], and steps from previous tasks:
+
+  - a. For the 10 biggest wheat producers the country-level values of N output in harvested wheat, as well as related total N inputs and N losses (i.e., surplus) is estimated, and exported the dataset as a csv file
+  
+  - b. The N outputs and losses for these 10 countries are summarized in one figure (plot exported as pdf file)
+
+## a. Estimated and Exported Dataset for the Top 10 Countries by N Outputs and Losses
+
+```{r}
+# The CSV file "Country_NUE_assumption.csv" with NUE data for countries, is loaded
+NUE_data = read.csv("data/NUE_Zhang_et_al_2015/Country_NUE_assumption.csv")
+
+# Create a data frame to store the results
+results = data.frame(
+  Country = character(0),
+  NUE = double(0),
+  Production_Mt = double(0), 
+  N_Output_Mt = double(0),
+  N_Inputs_Mt = double(0),
+  N_Losses_Mt = double(0)
+)
+```
+
+```{r, eval=compute_agg}
+# compute N output for top 10 countries
+country_aggregated_N_lst = lapply(as.numeric(row.names(top10_order[1:10,])), function(i){
+     raster::extract(nitrogen_output_raster, # raster layer
+	   sp_join_lst[[i]],  # spatial polygon for extraction
+	   fun=sum,           # what to value to extract
+	   df=TRUE,           # return a dataframe?
+	   na.rm = TRUE)      # remove NAs?               
+   })
+
+save(country_aggregated_N_lst, file = "output/country_aggregated_N_lst.RData")
+```
+
+```{r}
+load("output/country_aggregated_N_lst.RData")
+
+# Loop through the top 10 countries
+for (i in 1:10) {
+  # i = 1
+  country = top10_order$Country[i]
+  if(country == "United States of America") {
+    country_nue = "USA"
+  }else if(country == "Russian Federation") {
+    country_nue = "RussianFed"
+  }else country_nue = country
+  
+  # Calculate N output from your N output top 10 countries
+  N_Output_Mt <- as.numeric(country_aggregated_N_lst[[i]][2]) # column index = 2
+  
+  # Extract relevant data from NUE dataset
+  country_NUE = NUE_data[NUE_data$Country == country_nue, ]
+
+  # Calculate N inputs from NUE dataset and 
+  N_Inputs_Mt = country_NUE$NUE * top10_order$Wheat_Production_Mt[i]
+  
+  # Calculate N losses (surplus)
+  N_Losses_Mt = N_Inputs_Mt - N_Output_Mt
+  
+  # Add the data to the results data frame
+  results <- rbind(results, data.frame(Country = country, 
+                                       NUE = country_NUE,
+                                       Production_Mt = top10_order$Wheat_Production_Mt[i],
+                                       N_Output_Mt = N_Output_Mt, N_Inputs_Mt = N_Inputs_Mt, N_Losses_Mt = N_Losses_Mt))
+}
+
+results_print = results[,2:ncol(results)]
+
+results_print[,2:ncol(results_print)] = round(results_print[,2:ncol(results_print)], digits = 2)
+
+results_print
+
+# Export the results to a CSV file
+write.csv(results, "output/results.csv", row.names = FALSE)
+```
+
+## b. Visualization of the N Outputs and Losses
+
+```{r}
+# from the results data frame
+# create a data frame for plotting (N Outputs and Losses)
+library(reshape2)
+plot_data <- melt(results[,c(2,5,7)], id.vars = "NUE.Country") # N data in columns 1, 5 and 7
+
+# Create the bar plots
+p <- ggplot(plot_data, aes(x = NUE.Country, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "N Outputs and Losses for the Top 10 Wheat Global Producers",
+       y = "Million Tons (Mt)") +
+  scale_fill_manual(values = c("N_Output_Mt" = "green4", "N_Losses_Mt" = "red3")) +
+  theme_minimal()
+
+p
+
+# Export the plot as a PDF
+ggsave("output/results_N_outputs_losses.pdf", plot = p, width = 13, height = 8)
+```
+
+## c. Main Patterns of N Lossess across Countries
+- The main patterns of N losses across countries, in relation to production volume and NUE (including any singular feature) are explained in the following paragraph:
+
+  - In the analysis of the top 10 wheat-producing countries, varying patterns of nitrogen losses is observed. Some countries with high wheat production volumes and relatively low NUE, such as China, showed significant nitrogen losses, suggesting inefficiencies in nitrogen utilization. In contrast, countries with relative higher NUE, like Australia, exhibited lower losses despite high production. Additionally, a few countries, like France, displayed unexpected patterns of high losses compared to their NUE, potentially indicating other factors influencing nitrogen loss, such as agricultural practices or environmental conditions.  
+
+## Task 5
+In the following paragraph is explained how an analysis like the one performed in previous tasks could translate to the models within BNR's modeling suite (https://iiasa.github.io/iBIOM/en/main/), including potential limitations.
+
+- An analysis of nitrogen output, inputs, and losses in wheat production can inform IIASA BNR's modeling suite by providing critical data inputs for assessing the environmental impacts of agricultural practices. These data help in calibrating and validating models related to land use, nutrient management, and climate change mitigation, enhancing the suite's accuracy in predicting the effects of different agricultural scenarios on nitrogen cycling and environmental sustainability. Limitations, however, may arise from the simplifications made e.g. in assuming a fixed 2% nitrogen content in harvested yield, as actual values can vary. Additionally, model outcomes depend on the quality and comprehensiveness of input data, which can pose challenges in areas with limited data availability.
+
+## Task 6
+
+### Issues
+
+- In the Task 2, an implementation of the country-level aggregation step for computing the Global wheat production per country in parallel was needed due to the high computational burden reached and avoid RAM issues. Therefore, parallel pre-computed RData objects were created to be loaded in this step to render this reproducible presentation in a reasonable short time (less than one minute), i.e.
+
+  - “./output/sp_join_lst.RData”
+
+  - “./output/raster_lst.RData”
+
+  - "./output/country_aggregated_production_lst.RData"
+
+- Similarly in Task 3 the actual computation of the Global country production was coded in parallel and saved as an RData object to be loaded subsequently, i.e.
+ 
+  - “./output/country_aggregated_N_lst.RData”
+
+## Task 6
+
+### Assumptions
 - The computations were done by using the Geodetic CRS:  WGS 84.
 
 - The three input maps from the SPAM model for the year 2005 are global scale in raster format (5 arcminute spatial resolution):
-  - Estimates of yield (r_y) in Kg/Ha, 
-  - Physical area (r_a) in Ha, 
-  - Harvested area (r_h) in Ha.
+  - Estimates of yield in Kg/Ha, 
+  - Physical area in Ha, 
+  - Harvested area in Ha.
 
-- 1 ton is equal to 1,000 Kg, so 1 million ton is equal to 1,000,000,000 Kg, i.e. 1e9 Kg.
-
-
-## Issues
+- 1 ton is equal to 1,000 Kg, so 1 million ton is equal to 1,000,000,000 Kg, i.e. 1 million ton = 1e9 Kg.
 
 ## References
 
 ::: {#refs}
 :::
 
+## Session Info
+```{r}
+timing.end <- Sys.time()
+print(timing.elapsed <- timing.end - timing.ini)
+```
+
 ```{r}
 library(sessioninfo)
-sessioninfo::session_info(to_file = "session_info.log", info = "all")
+s_info = sessioninfo::session_info(to_file = "session_info.log", info = "all")
+
+print(s_info)
 ```

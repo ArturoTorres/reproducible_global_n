@@ -8,7 +8,7 @@
 
 <meta name="author" content="Arturo Torres">
 
-<title>Reproducible Global N</title>
+<title>ReSANGloW:</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -100,8 +100,8 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Reproducible Global N</h1>
-<p class="subtitle lead">Reproducible Spatial Analysis for Charting Nitrogen Dynamics in Global Wheat Production</p>
+<h1 class="title">ReSANGloW:</h1>
+<p class="subtitle lead">A Reproducible Spatial Analysis for Charting Nitrogen Dynamics in Global Wheat Production</p>
 </div>
 
 
@@ -114,7 +114,7 @@ div.csl-indent {
   </div>
     <div class="quarto-title-meta-contents">
         <p class="affiliation">
-            
+            LIST, ERIN
           </p>
       </div>
     </div>
@@ -125,7 +125,7 @@ div.csl-indent {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">Tuesday, October 17, 2023</p>
+      <p class="date">Wednesday, October 18, 2023</p>
     </div>
   </div>
   
@@ -135,6 +135,9 @@ div.csl-indent {
 
 </header>
 
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>timing.ini <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <section id="goal" class="level2">
 <h2 class="anchored" data-anchor-id="goal">Goal</h2>
 <ul>
@@ -150,35 +153,567 @@ div.csl-indent {
 <h2 class="anchored" data-anchor-id="task-1">Task 1</h2>
 <ul>
 <li><p>Using SPAM raster data <span class="citation" data-cites="wood-sichra_spatial_2016">(<a href="#ref-wood-sichra_spatial_2016" role="doc-biblioref">Wood-Sichra, Joglekar, and You 2016</a>)</span>, a new raster at the same resolution, containing wheat production volume (in million tons Mt) is produced.</p></li>
-<li><p>Global scale in a raster format (5 arcminute spatial resolution) estimates of yield (r_y) in Kg/Ha, physical area (r_a) in Ha and harvested area (r_h) in Ha for the year 2005 are available.</p></li>
-<li><p>wheat_production = spam_data[[“yield”]] * spam_data[[“harvested_area”]]</p></li>
-<li><p>A global map is created and the raster is exported in a geotif format.</p></li>
+<li><p>Global scale in a raster format (5 arcminute spatial resolution) estimates of yield in Kg/Ha, physical area in Ha and harvested area in Ha for the year 2005 are available.</p></li>
 </ul>
 <div class="cell">
 <div class="cell-output cell-output-stderr">
 <pre><code>terra 1.7.18</code></pre>
 </div>
+</div>
+</section>
+<section id="reading-spam-data" class="level2">
+<h2 class="anchored" data-anchor-id="reading-spam-data">Reading SPAM data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>spam_data <span class="ot">=</span> <span class="fu">list</span>(<span class="st">"yield"</span> <span class="ot">=</span> <span class="fu">rast</span>(<span class="st">"data/SPAM_2005_v3.2/SPAM2005V3r2_global_Y_TA_WHEA_A.tif"</span>),</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"harvested_area"</span> <span class="ot">=</span> <span class="fu">rast</span>(<span class="st">"data/SPAM_2005_v3.2/SPAM2005V3r2_global_H_TA_WHEA_A.tif"</span>),</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"physical_area"</span> <span class="ot">=</span> <span class="fu">rast</span>(<span class="st">"data/SPAM_2005_v3.2/SPAM2005V3r2_global_A_TA_WHEA_A.tif"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(spam_data)   </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>List of 3
  $ yield         :S4 class 'SpatRaster' [package "terra"]
  $ harvested_area:S4 class 'SpatRaster' [package "terra"]
  $ physical_area :S4 class 'SpatRaster' [package "terra"]</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>spam_data[[<span class="st">'yield'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class       : SpatRaster 
+dimensions  : 1853, 4320, 1  (nrow, ncol, nlyr)
+resolution  : 0.08333333, 0.08333333  (x, y)
+extent      : -180, 180, -64.41667, 90  (xmin, xmax, ymin, ymax)
+coord. ref. : lon/lat WGS 84 (EPSG:4326) 
+source      : SPAM2005V3r2_global_Y_TA_WHEA_A.tif 
+name        : SPAM2005V3r2_global_Y_TA_WHEA_A 
+min value   :                               0 
+max value   :                           19429 </code></pre>
+</div>
 </div>
 </section>
-<section id="assumptions-made" class="level2">
-<h2 class="anchored" data-anchor-id="assumptions-made">Assumptions made</h2>
+<section id="calculate-wheat-production" class="level2">
+<h2 class="anchored" data-anchor-id="calculate-wheat-production">Calculate Wheat Production</h2>
 <ul>
-<li>The three input maps from the SPAM model for the year 2005 are global scale in raster format (5 arcminute spatial resolution):
+<li><p>Calculate wheat production by multiplying the raster layers for yield (in Kg/Ha) and harvested area (in Ha) using the * operator:</p>
 <ul>
-<li>Estimates of yield (r_y) in Kg/Ha,</li>
-<li>Physical area (r_a) in Ha,</li>
-<li>Harvested area (r_h) in Ha.</li>
+<li>wheat_production = spam_data[[“yield”]] * spam_data[[“harvested_area”]]</li>
+</ul></li>
+<li><p>Convert Units: The resulting values are in Kg, so it is needed to convert them to million tons (Mt). Assuming 1 ton is equal to 1,000 Kg, it is possible to use the following:</p>
+<ul>
+<li>wheat_production_Mt = wheat_production / (1e3 * 1e6)</li>
 </ul></li>
 </ul>
 </section>
-<section id="issues" class="level2">
-<h2 class="anchored" data-anchor-id="issues">Issues</h2>
+<section id="calculate-wheat-production-1" class="level2">
+<h2 class="anchored" data-anchor-id="calculate-wheat-production-1">Calculate Wheat Production</h2>
+<ul>
+<li>A global map is created and the raster is exported in a geotif format:</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>wheat_production <span class="ot">=</span> spam_data[[<span class="st">"yield"</span>]] <span class="sc">*</span> spam_data[[<span class="st">"harvested_area"</span>]]</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>wheat_production_Mt <span class="ot">&lt;-</span> wheat_production <span class="sc">/</span> (<span class="fl">1e9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(raster)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: sp</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">writeRaster</span>(wheat_production_Mt, <span class="at">filename =</span> <span class="st">"./output/wheat_production_Mt.tif"</span>, </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">overwrite=</span><span class="cn">TRUE</span>, <span class="at">gdal =</span> <span class="fu">c</span>(<span class="st">"COMPRESS=DEFLATE"</span>, <span class="st">"TFW=YES"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="wheat-production-in-mt-in-2005" class="level2">
+<h2 class="anchored" data-anchor-id="wheat-production-in-mt-in-2005">Wheat Production in Mt in 2005</h2>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'scales'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:terra':
+
+    rescale</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: viridisLite</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'viridis'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:scales':
+
+    viridis_pal</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="global_n_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="task-2" class="level2">
+<h2 class="anchored" data-anchor-id="task-2">Task 2</h2>
+<ul>
+<li>Using the newly created raster and the GAUL shapefile of administrative borders, the production is aggregated to country level and exported to a csv file.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(raster)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Linking to GEOS 3.11.0, GDAL 3.5.3, PROJ 9.1.0; sf_use_s2() is TRUE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rgdal)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Please note that rgdal will be retired during 2023,
+plan transition to sf/stars/terra functions using GDAL and PROJ
+at your earliest convenience.
+See https://r-spatial.org/r/2022/04/12/evolution.html and https://github.com/r-spatial/evolution
+rgdal: version: 1.6-5, (SVN revision 1199)
+Geospatial Data Abstraction Library extensions to R successfully loaded
+Loaded GDAL runtime: GDAL 3.5.3, released 2022/10/21
+Path to GDAL shared files: /Users/torres/Library/R/arm64/4.2/library/sf/gdal
+ GDAL does not use iconv for recoding strings.
+GDAL binary built with GEOS: TRUE 
+Loaded PROJ runtime: Rel. 9.1.0, September 1st, 2022, [PJ_VERSION: 910]
+Path to PROJ shared files: /Users/torres/Library/R/arm64/4.2/library/rgdal/proj
+PROJ CDN enabled: FALSE
+Linking to sp version:1.6-0
+To mute warnings of possible GDAL/OSR exportToProj4() degradation,
+use options("rgdal_show_exportToProj4_warnings"="none") before loading sp or rgdal.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'rgdal'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:terra':
+
+    project</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rgeos)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>rgeos version: 0.6-2, (SVN revision 693)
+ GEOS runtime version: 3.11.0-CAPI-1.17.0 
+ Please note that rgeos will be retired during 2023,
+plan transition to sf functions using GEOS at your earliest convenience.
+ GEOS using OverlayNG
+ Linking to sp version: 1.6-0 
+ Polygon checking: TRUE </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>gaul_data_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"data/GAUL/g2015_2005_2.shp"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `g2015_2005_2' from data source 
+  `/Users/torres/Documents/02_working/3-Production/05_models/32_iiasa/global_n/data/GAUL/g2015_2005_2.shp' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 38189 features and 12 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -180 ymin: -89.9 xmax: 180 ymax: 83.62742
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>gaul_data_sp <span class="ot">&lt;-</span> <span class="fu">readOGR</span>(<span class="at">dsn =</span> <span class="st">"./data/GAUL"</span>, <span class="at">layer =</span> <span class="st">"g2015_2005_2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: OGR support is provided by the sf and terra packages among others</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: OGR support is provided by the sf and terra packages among others</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: OGR support is provided by the sf and terra packages among others</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: OGR support is provided by the sf and terra packages among others</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: OGR support is provided by the sf and terra packages among others</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: OGR support is provided by the sf and terra packages among others</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>OGR data source with driver: ESRI Shapefile 
+Source: "/Users/torres/Documents/02_working/3-Production/05_models/32_iiasa/global_n/data/GAUL", layer: "g2015_2005_2"
+with 38189 features
+It has 12 fields</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>gaul_lev0 <span class="ot">&lt;-</span> <span class="fu">levels</span>(<span class="fu">factor</span>(gaul_data_sp<span class="sc">@</span>data[,<span class="st">"ADM0_NAME"</span>]))</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>ids <span class="ot">&lt;-</span> <span class="fu">lapply</span>(gaul_lev0, <span class="cf">function</span>(x) <span class="fu">which</span>(gaul_data_sp<span class="sc">@</span>data[,<span class="st">"ADM0_NAME"</span>] <span class="sc">==</span> x))</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="co"># sp_join &lt;- as(gaul_data_sp, "SpatialPolygons")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(compute_agg <span class="sc">==</span> <span class="cn">TRUE</span>) { <span class="do">## Parallel computation</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(pbapply)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(parallel)</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(doParallel)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  ncores <span class="ot">=</span> <span class="fu">detectCores</span>() <span class="sc">-</span> <span class="dv">2</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ncores = 8</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  cluster <span class="ot">&lt;-</span> <span class="fu">makeCluster</span>(ncores)</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">registerDoParallel</span>(cluster, <span class="at">cores=</span>ncores)</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clusterEvalQ</span>(<span class="at">cl =</span> cluster, <span class="fu">c</span>(<span class="fu">library</span>(rgeos, raster)))</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clusterExport</span>(<span class="at">cl =</span> cluster, <span class="at">varlist =</span> <span class="fu">c</span>(<span class="st">"ids"</span>, <span class="st">"gaul_data_sp"</span>))</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>  sp_join_lst <span class="ot">&lt;-</span> <span class="fu">parLapply</span>(<span class="at">cl =</span> cluster, <span class="at">X =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(ids), <span class="at">fun =</span> <span class="cf">function</span>(i) {</span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste0</span>(i, <span class="st">"/"</span>, <span class="fu">length</span>(ids)))</span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">gUnionCascaded</span>(gaul_data_sp[ids[[i]],])</span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopCluster</span>(<span class="at">cl=</span>cluster)</span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save</span>(sp_join_lst, <span class="at">file =</span> <span class="st">"./output/sp_join_lst.RData"</span>)</span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"./output/sp_join_lst.RData"</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="co">#plot(sp_join)</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="co"># spplot(sp_join_lst[[1]], col = "red", main = gaul_lev0[1]) # Afganistan</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spplot</span>(sp_join_lst[[<span class="dv">57</span>]], <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">main =</span> gaul_lev0[<span class="dv">57</span>]) <span class="co"># Colombia</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="global_n_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spplot</span>(sp_join_lst[[<span class="dv">148</span>]], <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">main =</span> gaul_lev0[<span class="dv">148</span>]) <span class="co"># Luxemburgo</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="global_n_files/figure-html/unnamed-chunk-9-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># spplot(sp_join_lst[[10]], col = "red", main = gaul_lev0[10]) # Antigua y Barbuda</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># this chunk is not required (eval = TRUE only if a raster splitted per country is needed)</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(sp_join_lst[[<span class="dv">1</span>]])</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(compute_agg <span class="sc">==</span> <span class="cn">TRUE</span>){</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(pbapply)</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(parallel)</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(doParallel)</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>  ncores <span class="ot">=</span> <span class="fu">detectCores</span>() <span class="sc">-</span> <span class="dv">2</span></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ncores = 8</span></span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>  cluster <span class="ot">&lt;-</span> <span class="fu">makeCluster</span>(ncores)</span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">registerDoParallel</span>(cluster, <span class="at">cores=</span>ncores)</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clusterEvalQ</span>(<span class="at">cl =</span> cluster, <span class="fu">c</span>(<span class="fu">library</span>(rgeos, raster)))</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clusterExport</span>(<span class="at">cl =</span> cluster, <span class="at">varlist =</span> <span class="fu">c</span>(<span class="st">"sp_join_lst"</span>, <span class="st">"wheat_production_raster"</span>, <span class="st">"rasterize"</span>))</span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>raster_lst <span class="ot">&lt;-</span> <span class="fu">parLapply</span>(<span class="at">cl =</span> cluster, <span class="at">X =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(sp_join_lst), <span class="at">fun =</span> <span class="cf">function</span>(i) {</span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste0</span>(i, <span class="st">"/"</span>, <span class="fu">length</span>(sp_join_lst)))</span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rasterize</span>(sp_join_lst[[i]], wheat_production_raster)</span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a><span class="fu">stopCluster</span>(<span class="at">cl=</span>cluster)</span>
+<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(raster_lst, <span class="at">file =</span> <span class="st">"./output/raster_lst.RData"</span>)</span>
+<span id="cb40-26"><a href="#cb40-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb40-27"><a href="#cb40-27" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># this chunk is not required (eval = TRUE only if a raster splitted per country is needed)</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"./output/raster_lst.RData"</span>)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(raster_lst[[<span class="dv">260</span>]]) <span class="co">#USA</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(compute_agg <span class="sc">==</span> <span class="cn">TRUE</span>){</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(pbapply)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(parallel)</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(doParallel)</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  ncores <span class="ot">=</span> <span class="fu">detectCores</span>() <span class="sc">-</span> <span class="dv">2</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ncores = 8</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  cluster <span class="ot">&lt;-</span> <span class="fu">makeCluster</span>(ncores)</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">registerDoParallel</span>(cluster, <span class="at">cores=</span>ncores)</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clusterEvalQ</span>(<span class="at">cl =</span> cluster, <span class="fu">c</span>(<span class="fu">library</span>(raster)))</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clusterExport</span>(<span class="at">cl =</span> cluster, <span class="at">varlist =</span> <span class="fu">c</span>(<span class="st">"sp_join_lst"</span>, <span class="st">"wheat_production_raster"</span>))</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>  country_aggregated_production_lst <span class="ot">=</span> <span class="fu">parLapply</span>(<span class="at">cl =</span> cluster, <span class="at">X=</span><span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(sp_join_lst), <span class="at">fun =</span> <span class="cf">function</span>(i){</span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>     raster<span class="sc">::</span><span class="fu">extract</span>(wheat_production_raster, <span class="co"># raster layer</span></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>       sp_join_lst[[i]],  <span class="co"># spatial polygon for extraction</span></span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">fun=</span>sum,           <span class="co"># what to value to extract</span></span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">df=</span><span class="cn">TRUE</span>,           <span class="co"># return a dataframe?</span></span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">na.rm =</span> <span class="cn">TRUE</span>)      <span class="co"># remove NAs?               </span></span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>   })</span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopCluster</span>(<span class="at">cl=</span>cluster)</span>
+<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>   <span class="fu">save</span>(country_aggregated_production_lst, <span class="at">file =</span> <span class="st">"./output/country_aggregated_production_lst.RData"</span>)</span>
+<span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb42-26"><a href="#cb42-26" aria-hidden="true" tabindex="-1"></a>   <span class="fu">stopCluster</span>(<span class="at">cl=</span>cluster)</span>
+<span id="cb42-27"><a href="#cb42-27" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="create-a-data-frame-and-rename-columns" class="level2">
+<h2 class="anchored" data-anchor-id="create-a-data-frame-and-rename-columns">Create a Data Frame and Rename Columns</h2>
+<ul>
+<li><p>Rename the columns to indicate the country name and the aggregated wheat production in million tons.</p></li>
+<li><p>The country_production_df contains a data frame with each country’s name and its aggregated wheat production in million tons. This data frame can be used for further analysis or visualization, and export to a csv file.</p></li>
+</ul>
+</section>
+<section id="wheat-production-top-10-most-productive-countries-in-2005" class="level2">
+<h2 class="anchored" data-anchor-id="wheat-production-top-10-most-productive-countries-in-2005">Wheat Production: Top 10 Most Productive Countries in 2005</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"./output/country_aggregated_production_lst.RData"</span>)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>country_production_df <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="fu">do.call</span>(<span class="at">what =</span> rbind, <span class="at">args =</span> country_aggregated_production_lst)) </span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>country_production_df<span class="sc">$</span>ID <span class="ot">=</span> gaul_lev0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(country_production_df) <span class="ot">&lt;-</span> <span class="fu">c</span>( <span class="st">"Country"</span>, <span class="st">"Wheat_Production_Mt"</span>)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>top10_order <span class="ot">=</span> country_production_df[<span class="fu">order</span>(country_production_df<span class="sc">$</span>Wheat_Production_Mt, <span class="at">decreasing =</span> <span class="cn">TRUE</span>), ]</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>top10_order[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                     Country Wheat_Production_Mt
+52                     China            99.26530
+117                    India            69.55773
+260 United States of America            55.12679
+206       Russian Federation            46.02241
+85                    France            37.27257
+46                    Canada            25.26367
+93                   Germany            23.81824
+189                 Pakistan            20.89733
+251                   Turkey            20.83224
+16                 Australia            19.30162</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(country_production_df, <span class="at">file =</span> <span class="st">"output/country_production_wheat.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="task-3" class="level2">
+<h2 class="anchored" data-anchor-id="task-3">Task 3</h2>
+<ul>
+<li><p>To create a raster map of the nitrogen (N) output in harvested wheat yield, assuming that 2% of the harvested wheat yield consists of the N element, it is used again the “raster” package. Here are the steps to achieve this:</p>
+<ul>
+<li><p>Read the “wheat_production” raster created earlier in Task 1.</p></li>
+<li><p>Calculate Nitrogen Output Raster: A new raster that represents the nitrogen (N) output in harvested wheat yield is created. Assuming 2% of the harvested yield is N, the following formula is used:</p>
+<ul>
+<li>nitrogen_output_raster = wheat_production_raster * 0.02</li>
+</ul></li>
+<li><p>Plot the Nitrogen Output Raster: Visualize the “nitrogen_output_raster” using the plot function from the “raster” package.</p></li>
+<li><p>Export the Nitrogen Output Raster: To export the raster map of nitrogen output, the writeRaster function is used and saved in GeoTiff format.</p></li>
+</ul></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(raster)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>wheat_production_raster <span class="ot">=</span> <span class="fu">raster</span>(<span class="st">"output/wheat_production_Mt.tif"</span>)</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>nitrogen_output_raster <span class="ot">=</span> wheat_production_raster <span class="sc">*</span> <span class="fl">0.02</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="global-nitrogen-output" class="level2">
+<h2 class="anchored" data-anchor-id="global-nitrogen-output">Global Nitrogen Output</h2>
+<ul>
+<li>A raster map that represents the nitrogen (N) output in the harvested wheat yield has been created, based on the assumption that 2% of the yield consists of the N element. This map will show the distribution of nitrogen output in million tons (Mt) across the Globe.</li>
+</ul>
+</section>
+<section id="global-nitrogen-output-in-harvested-wheat-yield-in-mt-in-2005" class="level2">
+<h2 class="anchored" data-anchor-id="global-nitrogen-output-in-harvested-wheat-yield-in-mt-in-2005">Global Nitrogen Output in Harvested Wheat Yield in Mt in 2005</h2>
+<div class="columns">
+<div class="column" style="width:95%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(viridis)  <span class="co"># better colors for everyone</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggthemes) <span class="co"># theme_map()</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>df_n <span class="ot">=</span> <span class="fu">as</span>(nitrogen_output_raster, <span class="st">"SpatialPixelsDataFrame"</span>)</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>df_n <span class="ot">=</span> <span class="fu">as.data.frame</span>(df_n) </span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df_n)[<span class="dv">1</span>] <span class="ot">=</span> <span class="st">"N_out"</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span>  </span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="at">data=</span>df_n, <span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y=</span>y, <span class="at">fill=</span>N_out), <span class="at">alpha=</span><span class="fl">0.8</span>) <span class="sc">+</span> </span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_polygon(data=gaul_data_sp, aes(x=long, y=lat, group=group), fill=NA, color="grey50", size=0.25) +</span></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis</span>() <span class="sc">+</span></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_equal</span>() <span class="sc">+</span></span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_map</span>() <span class="sc">+</span></span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">"bottom"</span>) <span class="sc">+</span></span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.key.width=</span><span class="fu">unit</span>(<span class="dv">2</span>, <span class="st">"cm"</span>))  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="global_n_files/figure-html/nitrogen-output-plot-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ggtitle("Nitrogen Output in Harvested Wheat Yield in Mt for 2005") </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>raster<span class="sc">::</span><span class="fu">writeRaster</span>(nitrogen_output_raster, <span class="at">filename =</span> <span class="st">"output/nitrogen_output.tif"</span>, <span class="at">format =</span> <span class="st">"GTiff"</span>, <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="task-4" class="level2">
+<h2 class="anchored" data-anchor-id="task-4">Task 4</h2>
+<ul>
+<li><p>Using the dataset of country-level nitrogen use efficiency (NUE) of wheat from <span class="citation" data-cites="zhang_managing_2015">(<a href="#ref-zhang_managing_2015" role="doc-biblioref">Zhang et al. 2015</a>)</span>, and steps from previous tasks:</p>
+<ul>
+<li><ol type="a">
+<li>For the 10 biggest wheat producers the country-level values of N output in harvested wheat, as well as related total N inputs and N losses (i.e., surplus) is estimated, and exported the dataset as a csv file</li>
+</ol></li>
+<li><ol start="2" type="a">
+<li>The N outputs and losses for these 10 countries are summarized in one figure (plot exported as pdf file)</li>
+</ol></li>
+</ul></li>
+</ul>
+</section>
+<section id="a.-estimated-and-exported-dataset-for-the-top-10-countries-by-n-outputs-and-losses" class="level2">
+<h2 class="anchored" data-anchor-id="a.-estimated-and-exported-dataset-for-the-top-10-countries-by-n-outputs-and-losses">a. Estimated and Exported Dataset for the Top 10 Countries by N Outputs and Losses</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The CSV file "Country_NUE_assumption.csv" with NUE data for countries, is loaded</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>NUE_data <span class="ot">=</span> <span class="fu">read.csv</span>(<span class="st">"data/NUE_Zhang_et_al_2015/Country_NUE_assumption.csv"</span>)</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a data frame to store the results</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>results <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Country =</span> <span class="fu">character</span>(<span class="dv">0</span>),</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">NUE =</span> <span class="fu">double</span>(<span class="dv">0</span>),</span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">Production_Mt =</span> <span class="fu">double</span>(<span class="dv">0</span>), </span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">N_Output_Mt =</span> <span class="fu">double</span>(<span class="dv">0</span>),</span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">N_Inputs_Mt =</span> <span class="fu">double</span>(<span class="dv">0</span>),</span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">N_Losses_Mt =</span> <span class="fu">double</span>(<span class="dv">0</span>)</span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compute N output for top 10 countries</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>country_aggregated_N_lst <span class="ot">=</span> <span class="fu">lapply</span>(<span class="fu">as.numeric</span>(<span class="fu">row.names</span>(top10_order[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,])), <span class="cf">function</span>(i){</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>     raster<span class="sc">::</span><span class="fu">extract</span>(nitrogen_output_raster, <span class="co"># raster layer</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>       sp_join_lst[[i]],  <span class="co"># spatial polygon for extraction</span></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">fun=</span>sum,           <span class="co"># what to value to extract</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">df=</span><span class="cn">TRUE</span>,           <span class="co"># return a dataframe?</span></span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">na.rm =</span> <span class="cn">TRUE</span>)      <span class="co"># remove NAs?               </span></span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>   })</span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(country_aggregated_N_lst, <span class="at">file =</span> <span class="st">"output/country_aggregated_N_lst.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"output/country_aggregated_N_lst.RData"</span>)</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop through the top 10 countries</span></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) {</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># i = 1</span></span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>  country <span class="ot">=</span> top10_order<span class="sc">$</span>Country[i]</span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(country <span class="sc">==</span> <span class="st">"United States of America"</span>) {</span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>    country_nue <span class="ot">=</span> <span class="st">"USA"</span></span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span> <span class="cf">if</span>(country <span class="sc">==</span> <span class="st">"Russian Federation"</span>) {</span>
+<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a>    country_nue <span class="ot">=</span> <span class="st">"RussianFed"</span></span>
+<span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span> country_nue <span class="ot">=</span> country</span>
+<span id="cb53-12"><a href="#cb53-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb53-13"><a href="#cb53-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate N output from your N output top 10 countries</span></span>
+<span id="cb53-14"><a href="#cb53-14" aria-hidden="true" tabindex="-1"></a>  N_Output_Mt <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(country_aggregated_N_lst[[i]][<span class="dv">2</span>]) <span class="co"># column index = 2</span></span>
+<span id="cb53-15"><a href="#cb53-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb53-16"><a href="#cb53-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract relevant data from NUE dataset</span></span>
+<span id="cb53-17"><a href="#cb53-17" aria-hidden="true" tabindex="-1"></a>  country_NUE <span class="ot">=</span> NUE_data[NUE_data<span class="sc">$</span>Country <span class="sc">==</span> country_nue, ]</span>
+<span id="cb53-18"><a href="#cb53-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-19"><a href="#cb53-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate N inputs from NUE dataset and </span></span>
+<span id="cb53-20"><a href="#cb53-20" aria-hidden="true" tabindex="-1"></a>  N_Inputs_Mt <span class="ot">=</span> country_NUE<span class="sc">$</span>NUE <span class="sc">*</span> top10_order<span class="sc">$</span>Wheat_Production_Mt[i]</span>
+<span id="cb53-21"><a href="#cb53-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb53-22"><a href="#cb53-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate N losses (surplus)</span></span>
+<span id="cb53-23"><a href="#cb53-23" aria-hidden="true" tabindex="-1"></a>  N_Losses_Mt <span class="ot">=</span> N_Inputs_Mt <span class="sc">-</span> N_Output_Mt</span>
+<span id="cb53-24"><a href="#cb53-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb53-25"><a href="#cb53-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add the data to the results data frame</span></span>
+<span id="cb53-26"><a href="#cb53-26" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(<span class="at">Country =</span> country, </span>
+<span id="cb53-27"><a href="#cb53-27" aria-hidden="true" tabindex="-1"></a>                                       <span class="at">NUE =</span> country_NUE,</span>
+<span id="cb53-28"><a href="#cb53-28" aria-hidden="true" tabindex="-1"></a>                                       <span class="at">Production_Mt =</span> top10_order<span class="sc">$</span>Wheat_Production_Mt[i],</span>
+<span id="cb53-29"><a href="#cb53-29" aria-hidden="true" tabindex="-1"></a>                                       <span class="at">N_Output_Mt =</span> N_Output_Mt, <span class="at">N_Inputs_Mt =</span> N_Inputs_Mt, <span class="at">N_Losses_Mt =</span> N_Losses_Mt))</span>
+<span id="cb53-30"><a href="#cb53-30" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb53-31"><a href="#cb53-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-32"><a href="#cb53-32" aria-hidden="true" tabindex="-1"></a>results_print <span class="ot">=</span> results[,<span class="dv">2</span><span class="sc">:</span><span class="fu">ncol</span>(results)]</span>
+<span id="cb53-33"><a href="#cb53-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-34"><a href="#cb53-34" aria-hidden="true" tabindex="-1"></a>results_print[,<span class="dv">2</span><span class="sc">:</span><span class="fu">ncol</span>(results_print)] <span class="ot">=</span> <span class="fu">round</span>(results_print[,<span class="dv">2</span><span class="sc">:</span><span class="fu">ncol</span>(results_print)], <span class="at">digits =</span> <span class="dv">2</span>)</span>
+<span id="cb53-35"><a href="#cb53-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-36"><a href="#cb53-36" aria-hidden="true" tabindex="-1"></a>results_print</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    NUE.Country NUE.NUE Production_Mt N_Output_Mt N_Inputs_Mt N_Losses_Mt
+6         China    0.26         99.27        1.99       26.04       24.06
+19        India    0.25         69.56        1.39       17.38       15.99
+106         USA    0.51         55.13        1.10       28.00       26.90
+75   RussianFed    0.62         46.02        0.92       28.48       27.56
+7        France    0.74         37.27        0.75       27.65       26.91
+5        Canada    0.50         25.26        0.51       12.72       12.21
+8       Germany    0.46         23.82        0.48       10.92       10.45
+65     Pakistan    0.20         20.90        0.42        4.18        3.76
+99       Turkey    0.42         20.83        0.42        8.80        8.39
+2     Australia    0.54         19.30        0.39       10.44       10.05</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export the results to a CSV file</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(results, <span class="st">"output/results.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="b.-visualization-of-the-n-outputs-and-losses" class="level2">
+<h2 class="anchored" data-anchor-id="b.-visualization-of-the-n-outputs-and-losses">b. Visualization of the N Outputs and Losses</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from the results data frame</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="co"># create a data frame for plotting (N Outputs and Losses)</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reshape2)</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> <span class="fu">melt</span>(results[,<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">7</span>)], <span class="at">id.vars =</span> <span class="st">"NUE.Country"</span>) <span class="co"># N data in columns 1, 5 and 7</span></span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the bar plots</span></span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(plot_data, <span class="fu">aes</span>(<span class="at">x =</span> NUE.Country, <span class="at">y =</span> value, <span class="at">fill =</span> variable)) <span class="sc">+</span></span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"N Outputs and Losses for the Top 10 Wheat Global Producers"</span>,</span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Million Tons (Mt)"</span>) <span class="sc">+</span></span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"N_Output_Mt"</span> <span class="ot">=</span> <span class="st">"green4"</span>, <span class="st">"N_Losses_Mt"</span> <span class="ot">=</span> <span class="st">"red3"</span>)) <span class="sc">+</span></span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="global_n_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export the plot as a PDF</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"output/results_N_outputs_losses.pdf"</span>, <span class="at">plot =</span> p, <span class="at">width =</span> <span class="dv">13</span>, <span class="at">height =</span> <span class="dv">8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="c.-main-patterns-of-n-lossess-across-countries" class="level2">
+<h2 class="anchored" data-anchor-id="c.-main-patterns-of-n-lossess-across-countries">c.&nbsp;Main Patterns of N Lossess across Countries</h2>
+<ul>
+<li><p>The main patterns of N losses across countries, in relation to production volume and NUE (including any singular feature) are explained in the following paragraph:</p>
+<ul>
+<li>In the analysis of the top 10 wheat-producing countries, varying patterns of nitrogen losses is observed. Some countries with high wheat production volumes and relatively low NUE, such as China, showed significant nitrogen losses, suggesting inefficiencies in nitrogen utilization. In contrast, countries with relative higher NUE, like Australia, exhibited lower losses despite high production. Additionally, a few countries, like France, displayed unexpected patterns of high losses compared to their NUE, potentially indicating other factors influencing nitrogen loss, such as agricultural practices or environmental conditions.</li>
+</ul></li>
+</ul>
+</section>
+<section id="task-5" class="level2">
+<h2 class="anchored" data-anchor-id="task-5">Task 5</h2>
+<p>In the following paragraph is explained how an analysis like the one performed in previous tasks could translate to the models within BNR’s modeling suite (https://iiasa.github.io/iBIOM/en/main/), including potential limitations.</p>
+<ul>
+<li>An analysis of nitrogen output, inputs, and losses in wheat production can inform IIASA BNR’s modeling suite by providing critical data inputs for assessing the environmental impacts of agricultural practices. These data help in calibrating and validating models related to land use, nutrient management, and climate change mitigation, enhancing the suite’s accuracy in predicting the effects of different agricultural scenarios on nitrogen cycling and environmental sustainability. Limitations, however, may arise from the simplifications made e.g.&nbsp;in assuming a fixed 2% nitrogen content in harvested yield, as actual values can vary. Additionally, model outcomes depend on the quality and comprehensiveness of input data, which can pose challenges in areas with limited data availability.</li>
+</ul>
+</section>
+<section id="task-6" class="level2">
+<h2 class="anchored" data-anchor-id="task-6">Task 6</h2>
+<section id="issues" class="level3">
+<h3 class="anchored" data-anchor-id="issues">Issues</h3>
+<ul>
+<li><p>In the Task 2, an implementation of the country-level aggregation step for computing the Global wheat production per country in parallel was needed due to the high computational burden reached and avoid RAM issues. Therefore, parallel pre-computed RData objects were created to be loaded in this step to render this reproducible presentation in a reasonable short time, i.e.</p>
+<ul>
+<li><p>“./output/sp_join_lst.RData”</p></li>
+<li><p>“./output/raster_lst.RData”</p></li>
+<li><p>“./output/country_aggregated_production_lst.RData”</p></li>
+</ul></li>
+<li><p>Similarly in Task 3 the actual computation of the Global country production was coded in parallel and saved as an RData object to be loaded subsequently, i.e.</p>
+<ul>
+<li>“./output/country_aggregated_N_lst.RData”</li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="task-6-1" class="level2">
+<h2 class="anchored" data-anchor-id="task-6-1">Task 6</h2>
+<section id="assumptions" class="level3">
+<h3 class="anchored" data-anchor-id="assumptions">Assumptions</h3>
+<ul>
+<li><p>The computations were done by using the Geodetic CRS: WGS 84.</p></li>
+<li><p>The three input maps from the SPAM model for the year 2005 are global scale in raster format (5 arcminute spatial resolution):</p>
+<ul>
+<li>Estimates of yield in Kg/Ha,</li>
+<li>Physical area in Ha,</li>
+<li>Harvested area in Ha.</li>
+</ul></li>
+<li><p>1 ton is equal to 1,000 Kg, so 1 million ton is equal to 1,000,000,000 Kg, i.e.&nbsp;1 million ton = 1e9 Kg.</p></li>
+</ul>
+</section>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
@@ -186,10 +721,135 @@ div.csl-indent {
 <div id="ref-wood-sichra_spatial_2016" class="csl-entry" role="listitem">
 Wood-Sichra, Ulrike, Alison B Joglekar, and Liangzhi You. 2016. <span>“Spatial <span>Production</span> <span>Allocation</span> <span>Model</span> (<span>SPAM</span>) 2005: <span>Technical</span> <span>Documentation</span>.”</span>
 </div>
+<div id="ref-zhang_managing_2015" class="csl-entry" role="listitem">
+Zhang, Xin, Eric A. Davidson, Denise L. Mauzerall, Timothy D. Searchinger, Patrice Dumas, and Ye Shen. 2015. <span>“Managing Nitrogen for Sustainable Development.”</span> <em>Nature</em> 528 (7580): 51–59. <a href="https://doi.org/10.1038/nature15743">https://doi.org/10.1038/nature15743</a>.
+</div>
+</div>
+</section>
+<section id="session-info" class="level2">
+<h2 class="anchored" data-anchor-id="session-info">Session Info</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>timing.end <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(timing.elapsed <span class="ot">&lt;-</span> timing.end <span class="sc">-</span> timing.ini)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time difference of 44.67627 secs</code></pre>
+</div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sessioninfo)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>(<span class="at">to_file =</span> <span class="st">"session_info.log"</span>, <span class="at">info =</span> <span class="st">"all"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sessioninfo)</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>s_info <span class="ot">=</span> sessioninfo<span class="sc">::</span><span class="fu">session_info</span>(<span class="at">to_file =</span> <span class="st">"session_info.log"</span>, <span class="at">info =</span> <span class="st">"all"</span>)</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(s_info)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>─ Session info ───────────────────────────────────────────────────────────────
+ setting  value
+ version  R version 4.2.0 (2022-04-22)
+ os       macOS 13.4.1
+ system   aarch64, darwin20
+ ui       X11
+ language (EN)
+ collate  en_US.UTF-8
+ ctype    en_US.UTF-8
+ tz       Europe/Luxembourg
+ date     2023-10-18
+ pandoc   3.1.6.2 @ /opt/homebrew/bin/ (via rmarkdown)
+
+─ Packages ───────────────────────────────────────────────────────────────────
+ package     * version date (UTC) lib source
+ class         7.3-21  2023-01-23 [2] CRAN (R 4.2.0)
+ classInt      0.4-9   2023-02-28 [1] CRAN (R 4.2.0)
+ cli           3.6.0   2023-01-09 [1] CRAN (R 4.2.0)
+ codetools     0.2-19  2023-02-01 [2] CRAN (R 4.2.0)
+ colorspace    2.1-0   2023-01-23 [1] CRAN (R 4.2.0)
+ DBI           1.1.3   2022-06-18 [1] CRAN (R 4.2.0)
+ digest        0.6.31  2022-12-11 [1] CRAN (R 4.2.0)
+ dplyr         1.1.3   2023-09-03 [1] CRAN (R 4.2.0)
+ e1071         1.7-13  2023-02-01 [1] CRAN (R 4.2.0)
+ evaluate      0.20    2023-01-17 [1] CRAN (R 4.2.0)
+ fansi         1.0.4   2023-01-22 [1] CRAN (R 4.2.0)
+ farver        2.1.1   2022-07-06 [1] CRAN (R 4.2.0)
+ fastmap       1.1.1   2023-02-24 [1] CRAN (R 4.2.0)
+ generics      0.1.3   2022-07-05 [1] CRAN (R 4.2.0)
+ ggplot2     * 3.4.1   2023-02-10 [1] CRAN (R 4.2.0)
+ ggthemes    * 4.2.4   2021-01-20 [1] CRAN (R 4.2.0)
+ glue          1.6.2   2022-02-24 [1] CRAN (R 4.2.0)
+ gridExtra     2.3     2017-09-09 [1] CRAN (R 4.2.0)
+ gtable        0.3.1   2022-09-01 [1] CRAN (R 4.2.0)
+ htmltools     0.5.4   2022-12-07 [1] CRAN (R 4.2.0)
+ htmlwidgets   1.6.1   2023-01-07 [1] CRAN (R 4.2.0)
+ jsonlite      1.8.4   2022-12-06 [1] CRAN (R 4.2.0)
+ KernSmooth    2.23-20 2021-05-03 [2] CRAN (R 4.2.0)
+ knitr         1.42    2023-01-25 [1] CRAN (R 4.2.0)
+ labeling      0.4.2   2020-10-20 [1] CRAN (R 4.2.0)
+ lattice       0.20-45 2021-09-22 [2] CRAN (R 4.2.0)
+ lifecycle     1.0.3   2022-10-07 [1] CRAN (R 4.2.0)
+ magrittr      2.0.3   2022-03-30 [1] CRAN (R 4.2.0)
+ munsell       0.5.0   2018-06-12 [1] CRAN (R 4.2.0)
+ pillar        1.9.0   2023-03-22 [1] CRAN (R 4.2.0)
+ pkgconfig     2.0.3   2019-09-22 [1] CRAN (R 4.2.0)
+ plyr          1.8.8   2022-11-11 [1] CRAN (R 4.2.0)
+ proxy         0.4-27  2022-06-09 [1] CRAN (R 4.2.0)
+ purrr         1.0.1   2023-01-10 [1] CRAN (R 4.2.0)
+ R6            2.5.1   2021-08-19 [1] CRAN (R 4.2.0)
+ ragg          1.2.5   2023-01-12 [1] CRAN (R 4.2.0)
+ raster      * 3.6-20  2023-03-06 [1] CRAN (R 4.2.0)
+ Rcpp          1.0.10  2023-01-22 [1] CRAN (R 4.2.0)
+ reshape2    * 1.4.4   2020-04-09 [1] CRAN (R 4.2.0)
+ rgdal       * 1.6-5   2023-03-02 [1] CRAN (R 4.2.0)
+ rgeos       * 0.6-2   2023-03-02 [1] CRAN (R 4.2.0)
+ rlang         1.1.1   2023-04-28 [1] CRAN (R 4.2.0)
+ rmarkdown     2.20    2023-01-19 [1] CRAN (R 4.2.0)
+ rstudioapi    0.14    2022-08-22 [1] CRAN (R 4.2.0)
+ scales      * 1.2.1   2022-08-20 [1] CRAN (R 4.2.0)
+ sessioninfo * 1.2.2   2021-12-06 [1] CRAN (R 4.2.0)
+ sf          * 1.0-9   2022-11-08 [1] CRAN (R 4.2.0)
+ sp          * 1.6-0   2023-01-19 [1] CRAN (R 4.2.0)
+ stringi       1.7.12  2023-01-11 [1] CRAN (R 4.2.0)
+ stringr       1.5.0   2022-12-02 [1] CRAN (R 4.2.0)
+ systemfonts   1.0.4   2022-02-11 [1] CRAN (R 4.2.0)
+ terra       * 1.7-18  2023-03-06 [1] CRAN (R 4.2.0)
+ textshaping   0.3.6   2021-10-13 [1] CRAN (R 4.2.0)
+ tibble        3.2.1   2023-03-20 [1] CRAN (R 4.2.0)
+ tidyselect    1.2.0   2022-10-10 [1] CRAN (R 4.2.0)
+ units         0.8-1   2022-12-10 [1] CRAN (R 4.2.0)
+ utf8          1.2.3   2023-01-31 [1] CRAN (R 4.2.0)
+ vctrs         0.6.4   2023-10-12 [1] CRAN (R 4.2.0)
+ viridis     * 0.6.2   2021-10-13 [1] CRAN (R 4.2.0)
+ viridisLite * 0.4.1   2022-08-22 [1] CRAN (R 4.2.0)
+ withr         2.5.0   2022-03-03 [1] CRAN (R 4.2.0)
+ xfun          0.37    2023-01-31 [1] CRAN (R 4.2.0)
+ yaml          2.3.7   2023-01-23 [1] CRAN (R 4.2.0)
+
+ [1] /Users/torres/Library/R/arm64/4.2/library
+ [2] /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library
+
+─ External software ──────────────────────────────────────────────────────────
+ setting        value
+ cairo          1.16.0
+ cairoFT        2.11.1/2.13.94
+ pango
+ png            1.6.37
+ jpeg           9.4
+ tiff           LIBTIFF, Version 4.3.0
+ tcl            8.6.12
+ curl           7.88.1
+ zlib           1.2.11
+ bzlib          1.0.8, 13-Jul-2019
+ xz             5.2.5
+ PCRE           10.39 2021-10-29
+ ICU            70.2
+ TRE            TRE 0.8.0 R_fixes (BSD)
+ iconv          GNU libiconv 1.11
+ readline       5.2
+ BLAS           /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/lib/libRblas.0.dylib
+ lapack         /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/lib/libRlapack.dylib
+ lapack_version 3.10.0
+
+─ Python configuration ───────────────────────────────────────────────────────
+ Python is not available
+
+──────────────────────────────────────────────────────────────────────────────</code></pre>
+</div>
 </div>
 </section>
 
