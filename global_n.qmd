@@ -153,30 +153,31 @@ ids <- lapply(gaul_lev0, function(x) which(gaul_data_sp@data[,"ADM0_NAME"] == x)
 
 ```
 
-```{r parallel-join, echo=TRUE, eval=compute_agg}
 
-if(compute_agg == TRUE) { ## Parallel computation
-  library(pbapply)
-  library(parallel)
-  library(doParallel)
-  
-  ncores = detectCores() - 2
-  # ncores = 8
-  cluster <- makeCluster(ncores)
-  registerDoParallel(cluster, cores=ncores)
-  
-  clusterEvalQ(cl = cluster, c(library(rgeos, raster)))
-  clusterExport(cl = cluster, varlist = c("ids", "gaul_data_sp"))
-  
-  sp_join_lst <- parLapply(cl = cluster, X = 1:length(ids), fun = function(i) {
-    print(paste0(i, "/", length(ids)))
-    gUnionCascaded(gaul_data_sp[ids[[i]],])
-  })
+```{r parallel-join, echo=TRUE, eval=TRUE}
+# ```{r parallel-join, echo=TRUE, eval=compute_agg}
+## Parallel computation
+library(pbapply)
+library(parallel)
+library(doParallel)
 
-  stopCluster(cl=cluster)
-  
-  save(sp_join_lst, file = "./output/sp_join_lst.RData")
-}
+ncores = detectCores() - 2
+# ncores = 8
+cluster <- makeCluster(ncores)
+registerDoParallel(cluster, cores=ncores)
+
+clusterEvalQ(cl = cluster, c(library(rgeos, raster)))
+clusterExport(cl = cluster, varlist = c("ids", "gaul_data_sp"))
+
+sp_join_lst <- parLapply(cl = cluster, X = 1:length(ids), fun = function(i) {
+  print(paste0(i, "/", length(ids)))
+  gUnionCascaded(gaul_data_sp[ids[[i]],])
+})
+
+stopCluster(cl=cluster)
+
+save(sp_join_lst, file = "./output/sp_join_lst.RData")
+
 ```
 
 ```{r}

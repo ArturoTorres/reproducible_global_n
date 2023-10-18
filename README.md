@@ -26,7 +26,7 @@ git clone https://github.com/ArturoTorres/reproducible_global_n.git
 system("quarto render global_n.qmd --to all")
 ```
 
-## Help
+## (Task 4)
 
 ## Authors
 
@@ -37,10 +37,13 @@ Arturo Torres (jatorresma1\@gmail.com)\
 
 ## Version History
 
--   0.2
-    -   Various bug fixes and optimizations
+-   v0.2
+    -   Various bug fixes, additions and optimizations
     -   See [commit change]() or See [release history]()
--   0.1
+-   v0.1
     -   Initial Release
 
-## Acknowledgments
+## References
+-Ulrike Wood-Sichra, Alison B Joglekar, and Liangzhi You. Spatial Production Allocation Model (SPAM) 2005: Technical Documentation. 2016.
+
+- Xin Zhang, Eric A. Davidson, Denise L. Mauzerall, Timothy D. Searchinger, Patrice Dumas, and Ye Shen. Managing nitrogen for sustainable development. Nature, 528 (7580):51–59, December 2015. ISSN 0028-0836, 1476-4687. doi: 10.1038/nature15743. URL https://www.nature.com/articles/nature15743.
