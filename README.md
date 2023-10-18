@@ -36,7 +36,7 @@ system("quarto render global_n.qmd --to all")
 
 -   HTML (check it at "global_n.html")
 
-## Top 10 Countries Wheat-Producers and Nitrogen Outputs and Losses (Task 4)
+## Top 10 Countries Wheat-Producers and Nitrogen Outputs and Losses 
 
 -   Using the dataset of country-level nitrogen use efficiency (NUE) of wheat from [@zhang_managing_2015], and steps from previous tasks:
 
@@ -52,7 +52,7 @@ c.  The main patterns of N losses across countries, in relation to production vo
 
 -   In the analysis of the top 10 wheat-producing countries, varying patterns of nitrogen losses is observed. Some countries with high wheat production volumes and relatively low NUE, such as China, showed significant nitrogen losses, suggesting inefficiencies in nitrogen utilization. In contrast, countries with relative higher NUE, like Australia, exhibited lower losses despite high production. Additionally, a few countries, like France, displayed unexpected patterns of high losses compared to their NUE, potentially indicating other factors influencing nitrogen loss, such as agricultural practices or environmental conditions.
 
-## Integration within the BNR's Modeling Suite (Task 5)
+## Integration within the BNR's Modeling Suite 
 
 In the following paragraph is explained how an analysis like the one performed in previous tasks could translate to the models within BNR's modeling suite (https://iiasa.github.io/iBIOM/en/main/), including potential limitations.
 

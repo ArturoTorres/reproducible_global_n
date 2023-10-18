@@ -221,7 +221,7 @@ in Global Wheat Production}
 
 \begin{document}
 \frame{\titlepage}
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[enhanced, breakable, boxrule=0pt, sharp corners, interior hidden, borderline west={3pt}{0pt}{shadecolor}, frame hidden]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, enhanced, interior hidden, borderline west={3pt}{0pt}{shadecolor}, breakable, sharp corners, frame hidden]}{\end{tcolorbox}}\fi
 
 \begin{frame}{Goal}
 \protect\hypertarget{goal}{}
@@ -834,7 +834,7 @@ potential limitations.
   needed due to the high computational burden reached and avoid RAM
   issues. Therefore, parallel pre-computed RData objects were created to
   be loaded in this step to render this reproducible presentation in a
-  reasonable short time (less than one minute), i.e.
+  reasonable short time (less than three minutes), i.e.
 
   \begin{itemize}[<+->]
   \item
@@ -896,7 +896,7 @@ potential limitations.
 \linespread{0.5}
 
 \begin{verbatim}
-Time difference of 2.938351 mins
+Time difference of 2.93719 mins
 \end{verbatim}
 
 \linespread{2}

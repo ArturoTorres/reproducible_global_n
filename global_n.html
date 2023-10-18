@@ -659,48 +659,149 @@ It has 12 fields</code></pre>
 <span id="cb57-34"><a href="#cb57-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb57-35"><a href="#cb57-35" aria-hidden="true" tabindex="-1"></a>results_print[,<span class="dv">2</span><span class="sc">:</span><span class="fu">ncol</span>(results_print)] <span class="ot">=</span> <span class="fu">round</span>(results_print[,<span class="dv">2</span><span class="sc">:</span><span class="fu">ncol</span>(results_print)], <span class="at">digits =</span> <span class="dv">2</span>)</span>
 <span id="cb57-36"><a href="#cb57-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb57-37"><a href="#cb57-37" aria-hidden="true" tabindex="-1"></a><span class="co"># library(knitr)</span></span>
-<span id="cb57-38"><a href="#cb57-38" aria-hidden="true" tabindex="-1"></a><span class="co"># knitr::kable(results_print)</span></span>
-<span id="cb57-39"><a href="#cb57-39" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(results_print)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>   NUE.Country NUE.NUE Production_Mt N_Output_Mt N_Inputs_Mt N_Losses_Mt
-1        China    0.26         99.27        1.99       26.04       24.06
-2        India    0.25         69.56        1.39       17.38       15.99
-3          USA    0.51         55.13        1.10       28.00       26.90
-4   RussianFed    0.62         46.02        0.92       28.48       27.56
-5       France    0.74         37.27        0.75       27.65       26.91
-6       Canada    0.50         25.26        0.51       12.72       12.21
-7      Germany    0.46         23.82        0.48       10.92       10.45
-8     Pakistan    0.20         20.90        0.42        4.18        3.76
-9       Turkey    0.42         20.83        0.42        8.80        8.39
-10   Australia    0.54         19.30        0.39       10.44       10.05</code></pre>
+<span id="cb57-37"><a href="#cb57-37" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'knitr'</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export the results to a CSV file</span></span>
-<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(results, <span class="st">"output/results.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:terra':
+
+    spin</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(results_print)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 11%">
+<col style="width: 20%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">NUE.Country</th>
+<th style="text-align: right;">NUE.NUE</th>
+<th style="text-align: right;">Production_Mt</th>
+<th style="text-align: right;">N_Output_Mt</th>
+<th style="text-align: right;">N_Inputs_Mt</th>
+<th style="text-align: right;">N_Losses_Mt</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">China</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;">99.27</td>
+<td style="text-align: right;">1.99</td>
+<td style="text-align: right;">26.04</td>
+<td style="text-align: right;">24.06</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">India</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">69.56</td>
+<td style="text-align: right;">1.39</td>
+<td style="text-align: right;">17.38</td>
+<td style="text-align: right;">15.99</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">USA</td>
+<td style="text-align: right;">0.51</td>
+<td style="text-align: right;">55.13</td>
+<td style="text-align: right;">1.10</td>
+<td style="text-align: right;">28.00</td>
+<td style="text-align: right;">26.90</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">RussianFed</td>
+<td style="text-align: right;">0.62</td>
+<td style="text-align: right;">46.02</td>
+<td style="text-align: right;">0.92</td>
+<td style="text-align: right;">28.48</td>
+<td style="text-align: right;">27.56</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">France</td>
+<td style="text-align: right;">0.74</td>
+<td style="text-align: right;">37.27</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">27.65</td>
+<td style="text-align: right;">26.91</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Canada</td>
+<td style="text-align: right;">0.50</td>
+<td style="text-align: right;">25.26</td>
+<td style="text-align: right;">0.51</td>
+<td style="text-align: right;">12.72</td>
+<td style="text-align: right;">12.21</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Germany</td>
+<td style="text-align: right;">0.46</td>
+<td style="text-align: right;">23.82</td>
+<td style="text-align: right;">0.48</td>
+<td style="text-align: right;">10.92</td>
+<td style="text-align: right;">10.45</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Pakistan</td>
+<td style="text-align: right;">0.20</td>
+<td style="text-align: right;">20.90</td>
+<td style="text-align: right;">0.42</td>
+<td style="text-align: right;">4.18</td>
+<td style="text-align: right;">3.76</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Turkey</td>
+<td style="text-align: right;">0.42</td>
+<td style="text-align: right;">20.83</td>
+<td style="text-align: right;">0.42</td>
+<td style="text-align: right;">8.80</td>
+<td style="text-align: right;">8.39</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">19.30</td>
+<td style="text-align: right;">0.39</td>
+<td style="text-align: right;">10.44</td>
+<td style="text-align: right;">10.05</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="co"># print(results_print)</span></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Export the results to a CSV file</span></span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(results, <span class="st">"output/results.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="b.-visualization-of-the-n-outputs-and-losses" class="level2">
 <h2 class="anchored" data-anchor-id="b.-visualization-of-the-n-outputs-and-losses">b. Visualization of the N Outputs and Losses</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from the results data frame</span></span>
-<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="co"># create a data frame for plotting (N Outputs and Losses)</span></span>
-<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reshape2)</span>
-<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> <span class="fu">melt</span>(results[,<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">7</span>)], <span class="at">id.vars =</span> <span class="st">"NUE.Country"</span>) <span class="co"># N data in columns 1, 5 and 7</span></span>
-<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the bar plots</span></span>
-<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(plot_data, <span class="fu">aes</span>(<span class="at">x =</span> NUE.Country, <span class="at">y =</span> value, <span class="at">fill =</span> variable)) <span class="sc">+</span></span>
-<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"N Outputs and Losses for the Top 10 Wheat Global Producers"</span>,</span>
-<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Million Tons (Mt)"</span>) <span class="sc">+</span></span>
-<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"N_Output_Mt"</span> <span class="ot">=</span> <span class="st">"green4"</span>, <span class="st">"N_Losses_Mt"</span> <span class="ot">=</span> <span class="st">"red3"</span>)) <span class="sc">+</span></span>
-<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
-<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from the results data frame</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="co"># create a data frame for plotting (N Outputs and Losses)</span></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reshape2)</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> <span class="fu">melt</span>(results[,<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">7</span>)], <span class="at">id.vars =</span> <span class="st">"NUE.Country"</span>) <span class="co"># N data in columns 1, 5 and 7</span></span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the bar plots</span></span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(plot_data, <span class="fu">aes</span>(<span class="at">x =</span> NUE.Country, <span class="at">y =</span> value, <span class="at">fill =</span> variable)) <span class="sc">+</span></span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"N Outputs and Losses for the Top 10 Wheat Global Producers"</span>,</span>
+<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Million Tons (Mt)"</span>) <span class="sc">+</span></span>
+<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"N_Output_Mt"</span> <span class="ot">=</span> <span class="st">"green4"</span>, <span class="st">"N_Losses_Mt"</span> <span class="ot">=</span> <span class="st">"red3"</span>)) <span class="sc">+</span></span>
+<span id="cb62-12"><a href="#cb62-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb62-13"><a href="#cb62-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-14"><a href="#cb62-14" aria-hidden="true" tabindex="-1"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="global_n_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export the plot as a PDF</span></span>
-<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"output/results_N_outputs_losses.pdf"</span>, <span class="at">plot =</span> p, <span class="at">width =</span> <span class="dv">13</span>, <span class="at">height =</span> <span class="dv">8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export the plot as a PDF</span></span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"output/results_N_outputs_losses.pdf"</span>, <span class="at">plot =</span> p, <span class="at">width =</span> <span class="dv">13</span>, <span class="at">height =</span> <span class="dv">8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="c.-main-patterns-of-n-lossess-across-countries" class="level2">
@@ -767,17 +868,17 @@ Zhang, Xin, Eric A. Davidson, Denise L. Mauzerall, Timothy D. Searchinger, Patri
 <section id="session-info" class="level2">
 <h2 class="anchored" data-anchor-id="session-info">Session Info</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>timing.end <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
-<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(timing.elapsed <span class="ot">&lt;-</span> timing.end <span class="sc">-</span> timing.ini)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>timing.end <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(timing.elapsed <span class="ot">&lt;-</span> timing.end <span class="sc">-</span> timing.ini)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Time difference of 3.145242 mins</code></pre>
+<pre><code>Time difference of 3.130984 mins</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sessioninfo)</span>
-<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>s_info <span class="ot">=</span> sessioninfo<span class="sc">::</span><span class="fu">session_info</span>(<span class="at">to_file =</span> <span class="st">"session_info.log"</span>, <span class="at">info =</span> <span class="st">"all"</span>)</span>
-<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(s_info)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sessioninfo)</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>s_info <span class="ot">=</span> sessioninfo<span class="sc">::</span><span class="fu">session_info</span>(<span class="at">to_file =</span> <span class="st">"session_info.log"</span>, <span class="at">info =</span> <span class="st">"all"</span>)</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(s_info)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>─ Session info ───────────────────────────────────────────────────────────────
  setting  value
@@ -820,7 +921,7 @@ Zhang, Xin, Eric A. Davidson, Denise L. Mauzerall, Timothy D. Searchinger, Patri
  iterators   * 1.0.14  2022-02-05 [1] CRAN (R 4.2.0)
  jsonlite      1.8.4   2022-12-06 [1] CRAN (R 4.2.0)
  KernSmooth    2.23-20 2021-05-03 [2] CRAN (R 4.2.0)
- knitr         1.42    2023-01-25 [1] CRAN (R 4.2.0)
+ knitr       * 1.42    2023-01-25 [1] CRAN (R 4.2.0)
  labeling      0.4.2   2020-10-20 [1] CRAN (R 4.2.0)
  lattice       0.20-45 2021-09-22 [2] CRAN (R 4.2.0)
  lifecycle     1.0.3   2022-10-07 [1] CRAN (R 4.2.0)
