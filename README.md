@@ -28,6 +28,10 @@ system("quarto render global_n.qmd --to all")
 
 ## (Task 4)
 
+## (Task 5)
+
+## (Task 6)
+
 ## Authors
 
 Contributors names and contact info
