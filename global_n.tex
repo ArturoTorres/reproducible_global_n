@@ -221,7 +221,7 @@ in Global Wheat Production}
 
 \begin{document}
 \frame{\titlepage}
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, breakable, boxrule=0pt, enhanced, borderline west={3pt}{0pt}{shadecolor}, interior hidden, frame hidden]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[enhanced, breakable, boxrule=0pt, sharp corners, interior hidden, borderline west={3pt}{0pt}{shadecolor}, frame hidden]}{\end{tcolorbox}}\fi
 
 \begin{frame}{Goal}
 \protect\hypertarget{goal}{}
@@ -504,7 +504,7 @@ It has 12 fields
 
 \FunctionTok{stopCluster}\NormalTok{(}\AttributeTok{cl=}\NormalTok{cluster)}
 
-\FunctionTok{save}\NormalTok{(sp\_join\_lst, }\AttributeTok{file =} \StringTok{"./output/sp\_join\_lst.RData"}\NormalTok{)}
+\FunctionTok{save}\NormalTok{(sp\_join\_lst, }\AttributeTok{file =} \StringTok{"./data/sp\_join\_lst.RData"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -712,8 +712,8 @@ in Mt in 2005}
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{a. Estimated and Exported Dataset for the Top 10
-Countries by N Outputs and Losses}
+\begin{frame}{a. Estimated and Exported Dataset for the Top 10 Countries
+by N Outputs and Losses}
 \protect\hypertarget{a.-estimated-and-exported-dataset-for-the-top-10-countries-by-n-outputs-and-losses}{}
 \linespread{0.5}
 
@@ -725,19 +725,41 @@ Countries by N Outputs and Losses}
 
 \linespread{0.5}
 
-\begin{verbatim}
-    NUE.Country NUE.NUE Production_Mt N_Output_Mt N_Inputs_Mt N_Losses_Mt
-6         China    0.26         99.27        1.99       26.04       24.06
-19        India    0.25         69.56        1.39       17.38       15.99
-106         USA    0.51         55.13        1.10       28.00       26.90
-75   RussianFed    0.62         46.02        0.92       28.48       27.56
-7        France    0.74         37.27        0.75       27.65       26.91
-5        Canada    0.50         25.26        0.51       12.72       12.21
-8       Germany    0.46         23.82        0.48       10.92       10.45
-65     Pakistan    0.20         20.90        0.42        4.18        3.76
-99       Turkey    0.42         20.83        0.42        8.80        8.39
-2     Australia    0.54         19.30        0.39       10.44       10.05
-\end{verbatim}
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1714}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1143}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1714}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1714}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1714}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+NUE.Country
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+NUE.NUE
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Production\_Mt
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+N\_Output\_Mt
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+N\_Inputs\_Mt
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+N\_Losses\_Mt
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+China & 0.26 & 99.27 & 1.99 & 26.04 & 24.06 \\
+India & 0.25 & 69.56 & 1.39 & 17.38 & 15.99 \\
+USA & 0.51 & 55.13 & 1.10 & 28.00 & 26.90 \\
+RussianFed & 0.62 & 46.02 & 0.92 & 28.48 & 27.56 \\
+France & 0.74 & 37.27 & 0.75 & 27.65 & 26.91 \\
+Canada & 0.50 & 25.26 & 0.51 & 12.72 & 12.21 \\
+Germany & 0.46 & 23.82 & 0.48 & 10.92 & 10.45 \\
+Pakistan & 0.20 & 20.90 & 0.42 & 4.18 & 3.76 \\
+Turkey & 0.42 & 20.83 & 0.42 & 8.80 & 8.39 \\
+Australia & 0.54 & 19.30 & 0.39 & 10.44 & 10.05 \\
+\bottomrule\noalign{}
+\end{longtable}
 
 \linespread{2}
 \end{frame}
@@ -874,7 +896,7 @@ potential limitations.
 \linespread{0.5}
 
 \begin{verbatim}
-Time difference of 2.947485 mins
+Time difference of 2.938351 mins
 \end{verbatim}
 
 \linespread{2}
@@ -893,7 +915,7 @@ Time difference of 2.947485 mins
  ctype    en_US.UTF-8
  tz       Europe/Luxembourg
  date     2023-10-18
- pandoc   3.1.6.2 @ /opt/homebrew/bin/ (via rmarkdown)
+ pandoc   3.1.8 @ /opt/homebrew/bin/ (via rmarkdown)
 
 - Packages -------------------------------------------------------------------
  package     * version date (UTC) lib source
@@ -922,7 +944,7 @@ Time difference of 2.947485 mins
  iterators   * 1.0.14  2022-02-05 [1] CRAN (R 4.2.0)
  jsonlite      1.8.4   2022-12-06 [1] CRAN (R 4.2.0)
  KernSmooth    2.23-20 2021-05-03 [2] CRAN (R 4.2.0)
- knitr         1.42    2023-01-25 [1] CRAN (R 4.2.0)
+ knitr       * 1.42    2023-01-25 [1] CRAN (R 4.2.0)
  labeling      0.4.2   2020-10-20 [1] CRAN (R 4.2.0)
  lattice       0.20-45 2021-09-22 [2] CRAN (R 4.2.0)
  lifecycle     1.0.3   2022-10-07 [1] CRAN (R 4.2.0)

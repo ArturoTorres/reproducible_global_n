@@ -414,10 +414,13 @@ for (i in 1:10) {
 }
 
 results_print = results[,2:ncol(results)]
+row.names(results_print) = 1:10
 
 results_print[,2:ncol(results_print)] = round(results_print[,2:ncol(results_print)], digits = 2)
 
-results_print
+library(knitr)
+knitr::kable(results_print)
+# print(results_print)
 
 # Export the results to a CSV file
 write.csv(results, "output/results.csv", row.names = FALSE)
@@ -459,7 +462,7 @@ In the following paragraph is explained how an analysis like the one performed i
 
 ### Issues
 
-- In the Task 2, an implementation of the country-level aggregation step for computing the Global wheat production per country in parallel was needed due to the high computational burden reached and avoid RAM issues. Therefore, parallel pre-computed RData objects were created to be loaded in this step to render this reproducible presentation in a reasonable short time (less than one minute), i.e.
+- In the Task 2, an implementation of the country-level aggregation step for computing the Global wheat production per country in parallel was needed due to the high computational burden reached and avoid RAM issues. Therefore, parallel pre-computed RData objects were created to be loaded in this step to render this reproducible presentation in a reasonable short time (less than three minutes), i.e.
 
   - “./output/sp_join_lst.RData”
 

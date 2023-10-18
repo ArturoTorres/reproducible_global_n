@@ -1,4 +1,4 @@
-- Session info ---------------------------------------------------------------
+─ Session info ───────────────────────────────────────────────────────────────
  setting  value
  version  R version 4.2.0 (2022-04-22)
  os       macOS 13.4.1
@@ -9,9 +9,9 @@
  ctype    en_US.UTF-8
  tz       Europe/Luxembourg
  date     2023-10-18
- pandoc   3.1.6.2 @ /opt/homebrew/bin/ (via rmarkdown)
+ pandoc   3.1.8 @ /opt/homebrew/bin/ (via rmarkdown)
 
-- Packages -------------------------------------------------------------------
+─ Packages ───────────────────────────────────────────────────────────────────
  package     * version date (UTC) lib source
  class         7.3-21  2023-01-23 [2] CRAN (R 4.2.0)
  classInt      0.4-9   2023-02-28 [1] CRAN (R 4.2.0)
@@ -35,6 +35,7 @@
  gridExtra     2.3     2017-09-09 [1] CRAN (R 4.2.0)
  gtable        0.3.1   2022-09-01 [1] CRAN (R 4.2.0)
  htmltools     0.5.4   2022-12-07 [1] CRAN (R 4.2.0)
+ htmlwidgets   1.6.1   2023-01-07 [1] CRAN (R 4.2.0)
  iterators   * 1.0.14  2022-02-05 [1] CRAN (R 4.2.0)
  jsonlite      1.8.4   2022-12-06 [1] CRAN (R 4.2.0)
  KernSmooth    2.23-20 2021-05-03 [2] CRAN (R 4.2.0)
@@ -83,7 +84,7 @@
  [1] /Users/torres/Library/R/arm64/4.2/library
  [2] /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/library
 
-- External software ----------------------------------------------------------
+─ External software ──────────────────────────────────────────────────────────
  setting        value
  cairo          1.16.0
  cairoFT        2.11.1/2.13.94
@@ -105,7 +106,7 @@
  lapack         /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/lib/libRlapack.dylib
  lapack_version 3.10.0
 
-- Python configuration -------------------------------------------------------
+─ Python configuration ───────────────────────────────────────────────────────
  Python is not available
 
-------------------------------------------------------------------------------
+──────────────────────────────────────────────────────────────────────────────
