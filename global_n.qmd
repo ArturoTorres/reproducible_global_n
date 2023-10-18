@@ -47,13 +47,11 @@ timing.ini <- Sys.time()
 
     -   "Provide a reproducible code associated to these tasks."
 
-
 ## Task 1
 
-- Using SPAM raster data [@wood-sichra_spatial_2016], a new raster at the same resolution, containing wheat production volume (in million tons Mt) is produced. 
+-   Using SPAM raster data [@wood-sichra_spatial_2016], a new raster at the same resolution, containing wheat production volume (in million tons Mt) is produced.
 
-- Global scale in a raster format (5 arcminute spatial resolution) estimates of yield in Kg/Ha, physical area in Ha and harvested area in Ha for the year 2005 are available.
-
+-   Global scale in a raster format (5 arcminute spatial resolution) estimates of yield in Kg/Ha, physical area in Ha and harvested area in Ha for the year 2005 are available.
 
 ```{r, echo=FALSE}
 library(terra)
@@ -64,6 +62,7 @@ library(ggplot2)
 # describe("data/SPAM_2005_v3.2/SPAM2005V3r2_global_H_TA_WHEA_A.tif")
 
 ```
+
 ## Reading SPAM data
 
 ```{r, echo=TRUE}
@@ -78,19 +77,19 @@ str(spam_data)
 spam_data[['yield']]
 ```
 
-
-## Calculate Wheat Production
-- Calculate wheat production by multiplying the raster layers for yield (in Kg/Ha) and harvested area (in Ha) using the * operator: 
-
-  - wheat_production = spam_data[["yield"]] * spam_data[["harvested_area"]]
-
-- Convert Units: The resulting values are in Kg, so it is needed to convert them to million tons (Mt). Assuming 1 ton is equal to 1,000 Kg, it is possible to use the following:
-
-  - wheat_production_Mt = wheat_production / (1e3 * 1e6)
-
 ## Calculate Wheat Production
 
-- A global map is created and the raster is exported in a geotif format:
+-   Calculate wheat production by multiplying the raster layers for yield (in Kg/Ha) and harvested area (in Ha) using the \* operator:
+
+    -   wheat_production = spam_data\[\["yield"\]\] \* spam_data\[\["harvested_area"\]\]
+
+-   Convert Units: The resulting values are in Kg, so it is needed to convert them to million tons (Mt). Assuming 1 ton is equal to 1,000 Kg, it is possible to use the following:
+
+    -   wheat_production_Mt = wheat_production / (1e3 \* 1e6)
+
+## Calculate Wheat Production
+
+-   A global map is created and the raster is exported in a geotif format:
 
 ```{r, echo=TRUE}
 wheat_production = spam_data[["yield"]] * spam_data[["harvested_area"]]
@@ -105,6 +104,7 @@ writeRaster(wheat_production_Mt, filename = "./output/wheat_production_Mt.tif",
 ```
 
 ## Wheat Production in Mt in 2005
+
 ```{r, echo=FALSE}
 wheat_production_raster <- raster("output/wheat_production_Mt.tif")
 
@@ -133,7 +133,7 @@ ggplot() +
 
 ## Task 2
 
-- Using the newly created raster and the GAUL shapefile of administrative borders, the  production is aggregated to country level and exported to a csv file.
+-   Using the newly created raster and the GAUL shapefile of administrative borders, the production is aggregated to country level and exported to a csv file.
 
 ```{r pre-parallel, echo=TRUE}
 library(raster)
@@ -152,7 +152,6 @@ ids <- lapply(gaul_lev0, function(x) which(gaul_data_sp@data[,"ADM0_NAME"] == x)
 # sp_join <- as(gaul_data_sp, "SpatialPolygons")
 
 ```
-
 
 ```{r parallel-join, echo=TRUE, eval=TRUE}
 # ```{r parallel-join, echo=TRUE, eval=compute_agg}
@@ -190,7 +189,8 @@ spplot(sp_join_lst[[57]], col = "red", main = gaul_lev0[57]) # Colombia
 spplot(sp_join_lst[[148]], col = "red", main = gaul_lev0[148]) # Luxemburgo
 # spplot(sp_join_lst[[10]], col = "red", main = gaul_lev0[10]) # Antigua y Barbuda
 ```
-```{r parallel-agg, eval=FALSE} 
+
+```{r parallel-agg, eval=FALSE}
 # this chunk is not required (eval = TRUE only if a raster splitted per country is needed)
 
 str(sp_join_lst[[1]])
@@ -258,11 +258,12 @@ if(compute_agg == TRUE){
 }
   
 ```
+
 ## Create a Data Frame and Rename Columns
 
-- Rename the columns to indicate the country name and the aggregated wheat production in million tons.
+-   Rename the columns to indicate the country name and the aggregated wheat production in million tons.
 
-- The country_production_df contains a data frame with each country's name and its aggregated wheat production in million tons. This data frame can be used for further analysis or visualization, and export to a csv file.
+-   The country_production_df contains a data frame with each country's name and its aggregated wheat production in million tons. This data frame can be used for further analysis or visualization, and export to a csv file.
 
 ## Wheat Production: Top 10 Most Productive Countries in 2005
 
@@ -285,18 +286,18 @@ write.csv(country_production_df, file = "output/country_production_wheat.csv")
 ```
 
 ## Task 3
-- To create a raster map of the nitrogen (N) output in harvested wheat yield, assuming that 2% of the harvested wheat yield consists of the N element, it is used again the "raster" package. Here are the steps to achieve this:
 
-  - Read the "wheat_production" raster created earlier in Task 1. 
+-   To create a raster map of the nitrogen (N) output in harvested wheat yield, assuming that 2% of the harvested wheat yield consists of the N element, it is used again the "raster" package. Here are the steps to achieve this:
 
-  - Calculate Nitrogen Output Raster: A new raster that represents the nitrogen (N) output in harvested wheat yield is created. Assuming 2% of the harvested yield is N, the following formula is used:
+    -   Read the "wheat_production" raster created earlier in Task 1.
 
-    - nitrogen_output_raster = wheat_production_raster * 0.02
+    -   Calculate Nitrogen Output Raster: A new raster that represents the nitrogen (N) output in harvested wheat yield is created. Assuming 2% of the harvested yield is N, the following formula is used:
 
-  - Plot the Nitrogen Output Raster: Visualize the "nitrogen_output_raster" using the plot function from the "raster" package.
+        -   nitrogen_output_raster = wheat_production_raster \* 0.02
 
-  - Export the Nitrogen Output Raster:
-To export the raster map of nitrogen output, the writeRaster function is used and saved in GeoTiff format.
+    -   Plot the Nitrogen Output Raster: Visualize the "nitrogen_output_raster" using the plot function from the "raster" package.
+
+    -   Export the Nitrogen Output Raster: To export the raster map of nitrogen output, the writeRaster function is used and saved in GeoTiff format.
 
 ```{r nitrogen-output, echo=TRUE}
 library(raster)
@@ -308,12 +309,13 @@ nitrogen_output_raster = wheat_production_raster * 0.02
 ```
 
 ## Global Nitrogen Output
-- A raster map that represents the nitrogen (N) output in the harvested wheat yield has been created, based on the assumption that 2% of the yield consists of the N element. This map will show the distribution of nitrogen output in million tons (Mt) across the Globe. 
+
+-   A raster map that represents the nitrogen (N) output in the harvested wheat yield has been created, based on the assumption that 2% of the yield consists of the N element. This map will show the distribution of nitrogen output in million tons (Mt) across the Globe.
 
 ## Global Nitrogen Output in Harvested Wheat Yield in Mt in 2005
+
 ::: columns
 ::: {.column width="95%"}
-
 ```{r nitrogen-output-plot}
 
 library(ggplot2)
@@ -345,11 +347,15 @@ raster::writeRaster(nitrogen_output_raster, filename = "output/nitrogen_output.t
 
 ## Task 4
 
-- Using the dataset of country-level nitrogen use efficiency (NUE) of wheat from [@zhang_managing_2015], and steps from previous tasks:
+-   Using the dataset of country-level nitrogen use efficiency (NUE) of wheat from [@zhang_managing_2015], and steps from previous tasks:
 
-  - a. For the 10 biggest wheat producers the country-level values of N output in harvested wheat, as well as related total N inputs and N losses (i.e., surplus) is estimated, and exported the dataset as a csv file
-  
-  - b. The N outputs and losses for these 10 countries are summarized in one figure (plot exported as pdf file)
+    -   
+
+        a.  For the 10 biggest wheat producers the country-level values of N output in harvested wheat, as well as related total N inputs and N losses (i.e., surplus) is estimated, and exported the dataset as a csv file
+
+    -   
+
+        b.  The N outputs and losses for these 10 countries are summarized in one figure (plot exported as pdf file)
 
 ## a. Estimated and Exported Dataset for the Top 10 Countries by N Outputs and Losses
 
@@ -449,42 +455,46 @@ ggsave("output/results_N_outputs_losses.pdf", plot = p, width = 13, height = 8)
 ```
 
 ## c. Main Patterns of N Lossess across Countries
-- The main patterns of N losses across countries, in relation to production volume and NUE (including any singular feature) are explained in the following paragraph:
 
-  - In the analysis of the top 10 wheat-producing countries, varying patterns of nitrogen losses is observed. Some countries with high wheat production volumes and relatively low NUE, such as China, showed significant nitrogen losses, suggesting inefficiencies in nitrogen utilization. In contrast, countries with relative higher NUE, like Australia, exhibited lower losses despite high production. Additionally, a few countries, like France, displayed unexpected patterns of high losses compared to their NUE, potentially indicating other factors influencing nitrogen loss, such as agricultural practices or environmental conditions.  
+-   The main patterns of N losses across countries, in relation to production volume and NUE (including any singular feature) are explained in the following paragraph:
+
+    -   In the analysis of the top 10 wheat-producing countries, varying patterns of nitrogen losses is observed. Some countries with high wheat production volumes and relatively low NUE, such as China, showed significant nitrogen losses, suggesting inefficiencies in nitrogen utilization. In contrast, countries with relative higher NUE, like Australia, exhibited lower losses despite high production. Additionally, a few countries, like France, displayed unexpected patterns of high losses compared to their NUE, potentially indicating other factors influencing nitrogen loss, such as agricultural practices or environmental conditions.
 
 ## Task 5
+
 In the following paragraph is explained how an analysis like the one performed in previous tasks could translate to the models within BNR's modeling suite (https://iiasa.github.io/iBIOM/en/main/), including potential limitations.
 
-- An analysis of nitrogen output, inputs, and losses in wheat production can inform IIASA BNR's modeling suite by providing critical data inputs for assessing the environmental impacts of agricultural practices. These data help in calibrating and validating models related to land use, nutrient management, and climate change mitigation, enhancing the suite's accuracy in predicting the effects of different agricultural scenarios on nitrogen cycling and environmental sustainability. Limitations, however, may arise from the simplifications made e.g. in assuming a fixed 2% nitrogen content in harvested yield, as actual values can vary. Additionally, model outcomes depend on the quality and comprehensiveness of input data, which can pose challenges in areas with limited data availability.
+-   An analysis of nitrogen output, inputs, and losses in wheat production can inform IIASA BNR's modeling suite by providing critical data inputs for assessing the environmental impacts of agricultural practices. These data help in calibrating and validating models related to land use, nutrient management, and climate change mitigation, enhancing the suite's accuracy in predicting the effects of different agricultural scenarios on nitrogen cycling and environmental sustainability. Limitations, however, may arise from the simplifications made e.g. in assuming a fixed 2% nitrogen content in harvested yield, as actual values can vary. Additionally, model outcomes depend on the quality and comprehensiveness of input data, which can pose challenges in areas with limited data availability.
 
 ## Task 6
 
 ### Issues
 
-- In the Task 2, an implementation of the country-level aggregation step for computing the Global wheat production per country in parallel was needed due to the high computational burden reached and avoid RAM issues. Therefore, parallel pre-computed RData objects were created to be loaded in this step to render this reproducible presentation in a reasonable short time (less than three minutes), i.e.
+-   In the Task 2, an implementation of the country-level aggregation step for computing the Global wheat production per country in parallel was needed due to the high computational burden reached and avoid RAM issues. Therefore, parallel pre-computed RData objects were created to be loaded in this step to render this reproducible presentation in a reasonable short time (less than three minutes), i.e.
 
-  - “./output/sp_join_lst.RData”
+    -   "./output/sp_join_lst.RData"
 
-  - “./output/raster_lst.RData”
+    -   "./output/raster_lst.RData"
 
-  - "./output/country_aggregated_production_lst.RData"
+    -   "./output/country_aggregated_production_lst.RData"
 
-- Similarly in Task 3 the actual computation of the Global country production was coded in parallel and saved as an RData object to be loaded subsequently, i.e.
- 
-  - “./output/country_aggregated_N_lst.RData”
+-   Similarly in Task 3 the actual computation of the Global country production was coded in parallel and saved as an RData object to be loaded subsequently, i.e.
+
+    -   "./output/country_aggregated_N_lst.RData"
 
 ## Task 6
 
 ### Assumptions
-- The computations were done by using the Geodetic CRS:  WGS 84.
 
-- The three input maps from the SPAM model for the year 2005 are global scale in raster format (5 arcminute spatial resolution):
-  - Estimates of yield in Kg/Ha, 
-  - Physical area in Ha, 
-  - Harvested area in Ha.
+-   The computations were done by using the Geodetic CRS: WGS 84.
 
-- 1 ton is equal to 1,000 Kg, so 1 million ton is equal to 1,000,000,000 Kg, i.e. 1 million ton = 1e9 Kg.
+-   The three input maps from the SPAM model for the year 2005 are global scale in raster format (5 arcminute spatial resolution):
+
+    -   Estimates of yield in Kg/Ha,
+    -   Physical area in Ha,
+    -   Harvested area in Ha.
+
+-   1 ton is equal to 1,000 Kg, so 1 million ton is equal to 1,000,000,000 Kg, i.e. 1 million ton = 1e9 Kg.
 
 ## References
 
@@ -492,6 +502,7 @@ In the following paragraph is explained how an analysis like the one performed i
 :::
 
 ## Session Info
+
 ```{r}
 timing.end <- Sys.time()
 print(timing.elapsed <- timing.end - timing.ini)

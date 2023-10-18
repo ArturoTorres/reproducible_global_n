@@ -40,15 +40,15 @@ system("quarto render global_n.qmd --to all")
 
 a.  For the 10 biggest wheat producers the country-level values of N output in harvested wheat, as well as related total N inputs and N losses (i.e., surplus) is estimated, and exported the dataset as a csv file (check it at "output/results.csv"
 
-    ![Top 10 Wheat-producer Countries and Nitrogen (N) Outputs and Losses](static/top10_N_outputs_losses.png)
+![Top 10 Wheat-producer Countries and Nitrogen (N) Outputs and Losses](static/top10_N_outputs_losses.png)
 
 b.  The N outputs and losses for these 10 countries are summarized in one figure (plot exported as pdf file, check it at "output/results_N_outputs_losses.pdf")
 
-    ![Visualization of the Nitrogen (N) Outputs and Losses for Top 10 Wheat-producer Countries](output/results_N_outputs_losses.pdf)
+![Visualization of the Nitrogen (N) Outputs and Losses for Top 10 Wheat-producer Countries](output/results_N_outputs_losses.pdf)
 
 c.  The main patterns of N losses across countries, in relation to production volume and NUE (including any singular feature) are explained in the following paragraph:
 
-    -   In the analysis of the top 10 wheat-producing countries, varying patterns of nitrogen losses is observed. Some countries with high wheat production volumes and relatively low NUE, such as China, showed significant nitrogen losses, suggesting inefficiencies in nitrogen utilization. In contrast, countries with relative higher NUE, like Australia, exhibited lower losses despite high production. Additionally, a few countries, like France, displayed unexpected patterns of high losses compared to their NUE, potentially indicating other factors influencing nitrogen loss, such as agricultural practices or environmental conditions.
+-   In the analysis of the top 10 wheat-producing countries, varying patterns of nitrogen losses is observed. Some countries with high wheat production volumes and relatively low NUE, such as China, showed significant nitrogen losses, suggesting inefficiencies in nitrogen utilization. In contrast, countries with relative higher NUE, like Australia, exhibited lower losses despite high production. Additionally, a few countries, like France, displayed unexpected patterns of high losses compared to their NUE, potentially indicating other factors influencing nitrogen loss, such as agricultural practices or environmental conditions.
 
 ## Integration within the BNR's Modeling Suite (Task 5)
 
