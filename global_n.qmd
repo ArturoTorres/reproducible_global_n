@@ -176,13 +176,13 @@ sp_join_lst <- parLapply(cl = cluster, X = 1:length(ids), fun = function(i) {
 
 stopCluster(cl=cluster)
 
-save(sp_join_lst, file = "./output/sp_join_lst.RData")
+save(sp_join_lst, file = "./data/sp_join_lst.RData")
 
 ```
 
 ```{r}
 
-load("./output/sp_join_lst.RData")
+load("./data/sp_join_lst.RData")
 
 #plot(sp_join)
 # spplot(sp_join_lst[[1]], col = "red", main = gaul_lev0[1]) # Afganistan
