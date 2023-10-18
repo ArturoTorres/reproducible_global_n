@@ -24,6 +24,7 @@ git clone https://github.com/ArturoTorres/reproducible_global_n.git
 
 ### Executing program
 
+-   Copy the "data" folder with the input data
 -   Run in RStudio
 
 ```         
