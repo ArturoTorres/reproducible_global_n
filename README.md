@@ -6,6 +6,8 @@ Reproducible Spatial Analysis for Charting Nitrogen Dynamics in Global Wheat Pro
 
 This repository hosts an example of geospatial analysis and modeling tools for the Global sustainable management of agricultural resources. Leveraging techniques in spatial data science, it offers insights for land-use dynamics, crop yield modeling, and environmental impact assessment. The repository includes scripts for processing large datasets, visualizing geospatial results, and facilitating informed decision-making in agriculture and environmental science. Explore these resources to enhance your understanding of the complex interactions between land use, ecosystem dynamics, and societal objectives, or to contribute to the development of sustainable agricultural solutions.
 
+![Global Wheat Production in Mt, 2005](static/wheat_production_Mt.png)
+
 ## Getting Started
 
 ### Dependencies
@@ -44,7 +46,7 @@ a.  For the 10 biggest wheat producers the country-level values of N output in h
 
 b.  The N outputs and losses for these 10 countries are summarized in one figure (plot exported as pdf file, check it at "output/results_N_outputs_losses.pdf")
 
-![Visualization of the Nitrogen (N) Outputs and Losses for Top 10 Wheat-producer Countries](output/results_N_outputs_losses.pdf)
+![Visualization of the Nitrogen (N) Outputs and Losses for Top 10 Wheat-producer Countries](static/results_N_outputs_losses.png)
 
 c.  The main patterns of N losses across countries, in relation to production volume and NUE (including any singular feature) are explained in the following paragraph:
 
