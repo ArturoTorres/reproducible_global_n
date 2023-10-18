@@ -95,7 +95,8 @@ Arturo Torres (jatorresma1\@gmail.com)\
 
 ## Version History
 
--   v0.2
+-   v1.0
+    -   To submission
     -   Various bug fixes, additions and optimizations
     -   See [commit change]() or See [release history]()
 -   v0.1
